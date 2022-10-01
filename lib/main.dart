@@ -69,12 +69,110 @@ class MyHomePage extends StatelessWidget {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
-            CountDownText()
+            DateTimeSetter(),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: CountDownText(),
+            )
           ],
         ),
       ),
     );
   }
+}
+
+class DateTimeSetter extends StatefulWidget {
+  const DateTimeSetter({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _DateTimeSetterState();
+}
+
+class _PaddedTextField extends StatelessWidget {
+
+  final int _maxLength;
+  final String _hintText;
+
+  const _PaddedTextField({
+    Key? key,
+    required maxLength,
+    required hintText,
+  }) : _maxLength = maxLength,
+        _hintText = hintText,
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 20,
+        ),
+        child: TextField(
+          enabled: true,
+          maxLength: _maxLength,
+          maxLines: 1,
+          textAlign: TextAlign.right,
+          decoration: InputDecoration(
+            hintText: _hintText,
+            
+          ),
+        ),
+      ),
+    );
+  }
+
+}
+
+class _DateTimeSetterState extends State<DateTimeSetter> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: const [
+            _PaddedTextField(
+              maxLength: 4,
+              hintText: 'yyyy',
+            ),
+            _PaddedTextField(
+              maxLength: 2,
+              hintText: 'MM',
+            ),
+            _PaddedTextField(
+                maxLength: 2,
+                hintText: 'dd',
+            ),
+          ],
+        ),
+        Row(
+          children: const [
+            _PaddedTextField(
+              maxLength: 2,
+              hintText: 'hh',
+            ),
+            _PaddedTextField(
+              maxLength: 2,
+              hintText: 'mm',
+            ),
+            _PaddedTextField(
+              maxLength: 2,
+              hintText: 'ss',
+            ),
+          ],
+        ),
+        OutlinedButton(
+            onPressed: () {},
+            child: const Text(
+              'Update',
+            )
+        ),
+      ],
+    );
+  }
+
 }
 
 class CountDownText extends StatefulWidget {
