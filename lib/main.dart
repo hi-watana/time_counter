@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,21 +9,11 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -37,44 +28,23 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            DateTimeSetter(),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: CountDownText(),
-            )
-          ],
+        child: ChangeNotifierProvider<_Goal>(
+          create: (context) => _Goal(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const DateTimeSetter(),
+              Container(
+                margin: const EdgeInsets.all(20),
+                child: const CountDownText(),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -92,20 +62,23 @@ class _PaddedTextField extends StatelessWidget {
 
   final int _maxLength;
   final String _hintText;
+  final TextEditingController _controller;
 
   const _PaddedTextField({
     Key? key,
     required maxLength,
     required hintText,
+    required controller,
   }) : _maxLength = maxLength,
         _hintText = hintText,
+        _controller = controller,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
           vertical: 10,
           horizontal: 20,
         ),
@@ -114,9 +87,9 @@ class _PaddedTextField extends StatelessWidget {
           maxLength: _maxLength,
           maxLines: 1,
           textAlign: TextAlign.right,
+          controller: _controller,
           decoration: InputDecoration(
             hintText: _hintText,
-            
           ),
         ),
       ),
@@ -126,45 +99,67 @@ class _PaddedTextField extends StatelessWidget {
 }
 
 class _DateTimeSetterState extends State<DateTimeSetter> {
+  final TextEditingController _yearController = TextEditingController();
+  final TextEditingController _monthController = TextEditingController();
+  final TextEditingController _dayController = TextEditingController();
+  final TextEditingController _hourController = TextEditingController();
+  final TextEditingController _minuteController = TextEditingController();
+  final TextEditingController _secondController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final _Goal data = Provider.of<_Goal>(context);
+    
     return Column(
       children: [
         Row(
-          children: const [
+          children: [
             _PaddedTextField(
               maxLength: 4,
               hintText: 'yyyy',
+              controller: _yearController,
             ),
             _PaddedTextField(
               maxLength: 2,
               hintText: 'MM',
+              controller: _monthController,
             ),
             _PaddedTextField(
-                maxLength: 2,
-                hintText: 'dd',
+              maxLength: 2,
+              hintText: 'dd',
+              controller: _dayController,
             ),
           ],
         ),
         Row(
-          children: const [
+          children: [
             _PaddedTextField(
               maxLength: 2,
               hintText: 'hh',
+              controller: _hourController,
             ),
             _PaddedTextField(
               maxLength: 2,
               hintText: 'mm',
+              controller: _minuteController,
             ),
             _PaddedTextField(
               maxLength: 2,
               hintText: 'ss',
+              controller: _secondController,
             ),
           ],
         ),
         OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              final int year = int.parse(_yearController.text);
+              final int month = int.parse(_monthController.text);
+              final int day = int.parse(_dayController.text);
+              final int hour = int.parse(_hourController.text);
+              final int minute = int.parse(_minuteController.text);
+              final int second = int.parse(_secondController.text);
+              data.setGoal(year, month, day, hour, minute, second);
+            },
             child: const Text(
               'Update',
             )
@@ -182,8 +177,18 @@ class CountDownText extends StatefulWidget {
   State<CountDownText> createState() => _CountDownTextState();
 }
 
+class _Goal extends ChangeNotifier {
+  DateTime _goal = DateTime(2030, 1, 1);
+
+  void setGoal(int year, int month, int day, int hour, int minute, int second) {
+    _goal = DateTime(year, month, day, hour, minute, second);
+    notifyListeners();
+  }
+
+  DateTime getGoal() => _goal;
+}
+
 class _CountDownTextState extends State<CountDownText> with SingleTickerProviderStateMixin {
-  final DateTime _goal = DateTime(2030, 1, 1);
   late final Ticker _ticker;
   late DateTime _time;
 
@@ -207,14 +212,15 @@ class _CountDownTextState extends State<CountDownText> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final _Goal _goal = Provider.of<_Goal>(context);
     return Text(
-      _formatRemainingMicroSecond(_remainingMicroSecond()),
+      _formatRemainingMicroSecond(_remainingMicroSecond(_goal.getGoal())),
       style: Theme.of(context).textTheme.headline4,
     );
   }
 
-  int _remainingMicroSecond() {
-    return _goal.microsecondsSinceEpoch - _time.microsecondsSinceEpoch;
+  int _remainingMicroSecond(DateTime _dateTime) {
+    return _dateTime.microsecondsSinceEpoch - _time.microsecondsSinceEpoch;
   }
 
   String _formatRemainingMicroSecond(int remainingMicroSecond) {
