@@ -36,12 +36,12 @@ class MyHomePage extends StatelessWidget {
         child: ChangeNotifierProvider<_Goal>(
           create: (context) => _Goal(),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const DateTimeSetter(),
-              Container(
-                margin: const EdgeInsets.all(20),
-                child: const CountDownText(),
+              ChangeNotifierProvider<_TimeWrapper>(
+                create: (context) => _TimeWrapper(),
+                child: const _CountDownList(),
               )
             ],
           ),
@@ -161,7 +161,7 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
               data.setGoal(year, month, day, hour, minute, second);
             },
             child: const Text(
-              'Update',
+              'Add',
             )
         ),
       ],
@@ -188,20 +188,39 @@ class _Goal extends ChangeNotifier {
   DateTime getGoal() => _goal;
 }
 
-class _CountDownTextState extends State<CountDownText> with SingleTickerProviderStateMixin {
-  late final Ticker _ticker;
-  late DateTime _time;
+class _TimeWrapper extends ChangeNotifier {
+  DateTime _dateTime = DateTime.now();
+
+  void setTime(DateTime dateTime) {
+    _dateTime = dateTime;
+    notifyListeners();
+  }
+
+  DateTime getDateTime() => _dateTime;
+}
+
+class _CountDownList extends StatefulWidget {
+  const _CountDownList({Key? key}) : super(key: key);
 
   @override
-  void initState() {
-    super.initState();
-    _time = DateTime.now();
-    _ticker = createTicker((elapsed) {
-      setState(() {
-        _time = DateTime.now();
+  State<StatefulWidget> createState() => _CountDownListState();
+
+}
+
+class _CountDownListState extends State<_CountDownList> with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  _TimeWrapper? _timeWrapper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_timeWrapper == null) {
+      _timeWrapper = Provider.of<_TimeWrapper>(context);
+      _ticker = createTicker((elapsed) {
+        _timeWrapper!.setTime(DateTime.now());
       });
-    });
-    _ticker.start();
+      _ticker.start();
+    }
   }
 
   @override
@@ -212,15 +231,37 @@ class _CountDownTextState extends State<CountDownText> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView(
+        padding: const EdgeInsets.all(8),
+        children: const <Widget>[
+          Center(
+            child: CountDownText(),
+          ),
+          Center(
+            child: CountDownText(),
+          ),
+        ],
+      ),
+    );
+  }
+
+}
+
+class _CountDownTextState extends State<CountDownText> with SingleTickerProviderStateMixin {
+
+  @override
+  Widget build(BuildContext context) {
     final _Goal _goal = Provider.of<_Goal>(context);
+    final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
     return Text(
-      _formatRemainingMicroSecond(_remainingMicroSecond(_goal.getGoal())),
+      _formatRemainingMicroSecond(_remainingMicroSecond(_goal.getGoal(), _timeWrapper.getDateTime())),
       style: Theme.of(context).textTheme.headline4,
     );
   }
 
-  int _remainingMicroSecond(DateTime _dateTime) {
-    return _dateTime.microsecondsSinceEpoch - _time.microsecondsSinceEpoch;
+  int _remainingMicroSecond(DateTime _goal, DateTime _current) {
+    return _goal.microsecondsSinceEpoch - _current.microsecondsSinceEpoch;
   }
 
   String _formatRemainingMicroSecond(int remainingMicroSecond) {
