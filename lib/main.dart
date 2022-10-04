@@ -33,15 +33,15 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: Center(
-        child: ChangeNotifierProvider<_Goal>(
-          create: (context) => _Goal(),
+        child: ChangeNotifierProvider<_DateTimeList>(
+          create: (context) => _DateTimeList(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const DateTimeSetter(),
               ChangeNotifierProvider<_TimeWrapper>(
                 create: (context) => _TimeWrapper(),
-                child: const _CountDownList(),
+                child: const _CountDownListView(),
               )
             ],
           ),
@@ -108,8 +108,8 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
 
   @override
   Widget build(BuildContext context) {
-    final _Goal data = Provider.of<_Goal>(context);
-    
+    final _DateTimeList _countDownList = Provider.of<_DateTimeList>(context);
+
     return Column(
       children: [
         Row(
@@ -158,7 +158,7 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
               final int hour = int.parse(_hourController.text);
               final int minute = int.parse(_minuteController.text);
               final int second = int.parse(_secondController.text);
-              data.setGoal(year, month, day, hour, minute, second);
+              _countDownList.add(DateTime(year, month, day, hour, minute, second));
             },
             child: const Text(
               'Add',
@@ -170,22 +170,13 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
 
 }
 
-class CountDownText extends StatefulWidget {
-  const CountDownText({Key? key}) : super(key: key);
+class CountDownElement extends StatefulWidget {
+  final DateTime goal;
+
+  const CountDownElement({Key? key, required this.goal}) : super(key: key);
 
   @override
-  State<CountDownText> createState() => _CountDownTextState();
-}
-
-class _Goal extends ChangeNotifier {
-  DateTime _goal = DateTime(2030, 1, 1);
-
-  void setGoal(int year, int month, int day, int hour, int minute, int second) {
-    _goal = DateTime(year, month, day, hour, minute, second);
-    notifyListeners();
-  }
-
-  DateTime getGoal() => _goal;
+  State<CountDownElement> createState() => _CountDownElementState();
 }
 
 class _TimeWrapper extends ChangeNotifier {
@@ -199,15 +190,31 @@ class _TimeWrapper extends ChangeNotifier {
   DateTime getDateTime() => _dateTime;
 }
 
-class _CountDownList extends StatefulWidget {
-  const _CountDownList({Key? key}) : super(key: key);
+class _DateTimeList extends ChangeNotifier {
+  final List<DateTime> _list = [];
+
+  void add(DateTime dateTime) {
+    _list.add(dateTime);
+    notifyListeners();
+  }
+
+  void removeAt(int i) {
+    _list.removeAt(i);
+    notifyListeners();
+  }
+
+  List<DateTime> get() => List.unmodifiable(_list);
+}
+
+class _CountDownListView extends StatefulWidget {
+  const _CountDownListView({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _CountDownListState();
+  State<StatefulWidget> createState() => _CountDownListViewState();
 
 }
 
-class _CountDownListState extends State<_CountDownList> with SingleTickerProviderStateMixin {
+class _CountDownListViewState extends State<_CountDownListView> with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
   _TimeWrapper? _timeWrapper;
 
@@ -231,32 +238,43 @@ class _CountDownListState extends State<_CountDownList> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
+    final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
+
     return Expanded(
-      child: ListView(
-        padding: const EdgeInsets.all(8),
-        children: const <Widget>[
-          Center(
-            child: CountDownText(),
-          ),
-          Center(
-            child: CountDownText(),
-          ),
-        ],
-      ),
+        child: ListView(
+          padding: const EdgeInsets.all(8),
+          children: _dateTimeList.get().map((e) {
+            return Center(
+              child: CountDownElement(
+                goal: e,
+              ),
+            );
+          }).toList(),
+        )
     );
   }
 
 }
 
-class _CountDownTextState extends State<CountDownText> with SingleTickerProviderStateMixin {
+class _CountDownElementState extends State<CountDownElement> {
 
   @override
   Widget build(BuildContext context) {
-    final _Goal _goal = Provider.of<_Goal>(context);
     final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
-    return Text(
-      _formatRemainingMicroSecond(_remainingMicroSecond(_goal.getGoal(), _timeWrapper.getDateTime())),
-      style: Theme.of(context).textTheme.headline4,
+    return Container(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: <Widget>[
+            Text(
+              widget.goal.toString(),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            Text(
+              _formatRemainingMicroSecond(_remainingMicroSecond(widget.goal, _timeWrapper.getDateTime())),
+              style: Theme.of(context).textTheme.headline4,
+            )
+          ],
+        )
     );
   }
 
