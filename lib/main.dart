@@ -3,11 +3,43 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider<_TimeWrapper>(
+        create: (context) => _TimeWrapper(),
+        child: const MyApp()
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _MyAppState();
+
+}
+
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  _TimeWrapper? _timeWrapper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_timeWrapper == null) {
+      _timeWrapper = Provider.of<_TimeWrapper>(context);
+      _ticker = createTicker((elapsed) {
+        _timeWrapper!.setTime(DateTime.now());
+      });
+      _ticker.start();
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +70,8 @@ class MyHomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              const DateTimeSetter(),
-              ChangeNotifierProvider<_TimeWrapper>(
-                create: (context) => _TimeWrapper(),
-                child: const _CountdownListView(),
-              )
+              DateTimeSetter(),
+              const _CountdownListView(),
             ],
           ),
         ),
@@ -51,60 +80,16 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class DateTimeSetter extends StatefulWidget {
-  const DateTimeSetter({Key? key}) : super(key: key);
+class DateTimeSetter extends StatelessWidget {
 
-  @override
-  State<StatefulWidget> createState() => _DateTimeSetterState();
-}
-
-class _PaddedTextField extends StatelessWidget {
-
-  final int _maxLength;
-  final String _hintText;
-  final TextEditingController _controller;
-
-  const _PaddedTextField({
-    Key? key,
-    required maxLength,
-    required hintText,
-    required controller,
-  }) : _maxLength = maxLength,
-        _hintText = hintText,
-        _controller = controller,
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      child: Container(
-        margin: const EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 20,
-        ),
-        child: TextField(
-          enabled: true,
-          maxLength: _maxLength,
-          maxLines: 1,
-          textAlign: TextAlign.right,
-          controller: _controller,
-          decoration: InputDecoration(
-            hintText: _hintText,
-          ),
-        ),
-      ),
-    );
-  }
-
-}
-
-class _DateTimeSetterState extends State<DateTimeSetter> {
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _monthController = TextEditingController();
   final TextEditingController _dayController = TextEditingController();
   final TextEditingController _hourController = TextEditingController();
   final TextEditingController _minuteController = TextEditingController();
   final TextEditingController _secondController = TextEditingController();
+
+  DateTimeSetter({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -167,6 +152,45 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
       ],
     );
   }
+}
+
+class _PaddedTextField extends StatelessWidget {
+
+  final int _maxLength;
+  final String _hintText;
+  final TextEditingController _controller;
+
+  const _PaddedTextField({
+    Key? key,
+    required maxLength,
+    required hintText,
+    required controller,
+  }) : _maxLength = maxLength,
+        _hintText = hintText,
+        _controller = controller,
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 20,
+        ),
+        child: TextField(
+          enabled: true,
+          maxLength: _maxLength,
+          maxLines: 1,
+          textAlign: TextAlign.right,
+          controller: _controller,
+          decoration: InputDecoration(
+            hintText: _hintText,
+          ),
+        ),
+      ),
+    );
+  }
 
 }
 
@@ -219,27 +243,7 @@ class _CountdownListView extends StatefulWidget {
 
 }
 
-class _CountdownListViewState extends State<_CountdownListView> with SingleTickerProviderStateMixin {
-  late final Ticker _ticker;
-  _TimeWrapper? _timeWrapper;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_timeWrapper == null) {
-      _timeWrapper = Provider.of<_TimeWrapper>(context);
-      _ticker = createTicker((elapsed) {
-        _timeWrapper!.setTime(DateTime.now());
-      });
-      _ticker.start();
-    }
-  }
-
-  @override
-  void dispose() {
-    _ticker.dispose();
-    super.dispose();
-  }
+class _CountdownListViewState extends State<_CountdownListView> {
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +270,6 @@ class _CountdownElementState extends State<CountdownElement> {
 
   @override
   Widget build(BuildContext context) {
-    final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
     final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
     return Container(
         padding: const EdgeInsets.all(8),
@@ -276,18 +279,83 @@ class _CountdownElementState extends State<CountdownElement> {
               widget.goal.toString(),
               style: Theme.of(context).textTheme.headline6,
             ),
-            Text(
-              _formatRemainingMicroSecond(_remainingMicroSecond(widget.goal, _timeWrapper.getDateTime())),
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            OutlinedButton(
-              onPressed: () => _dateTimeList.removeAt(widget.index),
-              child: const Text(
-                'Remove',
-              ),
+            _CountdownText(goal: widget.goal),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                OutlinedButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => _CountdownView(goal: widget.goal),
+                  )),
+                  child: const Text(
+                    'See',
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () => _dateTimeList.removeAt(widget.index),
+                  child: const Text(
+                    'Remove',
+                  ),
+                ),
+              ],
             ),
           ],
         )
+    );
+  }
+}
+
+class _CountdownView extends StatelessWidget {
+  final DateTime _goal;
+
+  const _CountdownView({Key? key, required goal}) : _goal = goal, super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Countdown'),
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              _goal.toString(),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            _CountdownText(goal: _goal),
+          ],
+        ),
+      ),
+    );
+  }
+
+}
+
+class _CountdownText extends StatefulWidget {
+  final DateTime goal;
+
+  const _CountdownText({Key? key, required this.goal}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _CountdownTextState();
+
+}
+
+class _CountdownTextState extends State<_CountdownText> {
+  @override
+  Widget build(BuildContext context) {
+    final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
+    return Text(
+      _formatRemainingMicroSecond(_remainingMicroSecond(widget.goal, _timeWrapper.getDateTime())),
+      style: Theme.of(context).textTheme.headline4,
     );
   }
 
