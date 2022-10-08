@@ -12,11 +12,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Countdown',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Countdown'),
     );
   }
 }
@@ -41,7 +41,7 @@ class MyHomePage extends StatelessWidget {
               const DateTimeSetter(),
               ChangeNotifierProvider<_TimeWrapper>(
                 create: (context) => _TimeWrapper(),
-                child: const _CountDownListView(),
+                child: const _CountdownListView(),
               )
             ],
           ),
@@ -170,13 +170,18 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
 
 }
 
-class CountDownElement extends StatefulWidget {
+class CountdownElement extends StatefulWidget {
   final DateTime goal;
+  final int index;
 
-  const CountDownElement({Key? key, required this.goal}) : super(key: key);
+  const CountdownElement({
+    Key? key,
+    required this.goal,
+    required this.index,
+  }) : super(key: key);
 
   @override
-  State<CountDownElement> createState() => _CountDownElementState();
+  State<CountdownElement> createState() => _CountdownElementState();
 }
 
 class _TimeWrapper extends ChangeNotifier {
@@ -206,15 +211,15 @@ class _DateTimeList extends ChangeNotifier {
   List<DateTime> get() => List.unmodifiable(_list);
 }
 
-class _CountDownListView extends StatefulWidget {
-  const _CountDownListView({Key? key}) : super(key: key);
+class _CountdownListView extends StatefulWidget {
+  const _CountdownListView({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _CountDownListViewState();
+  State<StatefulWidget> createState() => _CountdownListViewState();
 
 }
 
-class _CountDownListViewState extends State<_CountDownListView> with SingleTickerProviderStateMixin {
+class _CountdownListViewState extends State<_CountdownListView> with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
   _TimeWrapper? _timeWrapper;
 
@@ -243,10 +248,11 @@ class _CountDownListViewState extends State<_CountDownListView> with SingleTicke
     return Expanded(
         child: ListView(
           padding: const EdgeInsets.all(8),
-          children: _dateTimeList.get().map((e) {
+          children: _dateTimeList.get().asMap().entries.map((e) {
             return Center(
-              child: CountDownElement(
-                goal: e,
+              child: CountdownElement(
+                goal: e.value,
+                index: e.key,
               ),
             );
           }).toList(),
@@ -256,11 +262,12 @@ class _CountDownListViewState extends State<_CountDownListView> with SingleTicke
 
 }
 
-class _CountDownElementState extends State<CountDownElement> {
+class _CountdownElementState extends State<CountdownElement> {
 
   @override
   Widget build(BuildContext context) {
     final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
+    final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
     return Container(
         padding: const EdgeInsets.all(8),
         child: Column(
@@ -272,7 +279,13 @@ class _CountDownElementState extends State<CountDownElement> {
             Text(
               _formatRemainingMicroSecond(_remainingMicroSecond(widget.goal, _timeWrapper.getDateTime())),
               style: Theme.of(context).textTheme.headline4,
-            )
+            ),
+            OutlinedButton(
+              onPressed: () => _dateTimeList.removeAt(widget.index),
+              child: const Text(
+                'Remove',
+              ),
+            ),
           ],
         )
     );
