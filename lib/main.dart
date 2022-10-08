@@ -194,18 +194,53 @@ class _PaddedTextField extends StatelessWidget {
 
 }
 
-class CountdownElement extends StatefulWidget {
-  final DateTime goal;
-  final int index;
+class CountdownElement extends StatelessWidget {
+  final DateTime _goal;
+  final int _index;
 
   const CountdownElement({
     Key? key,
-    required this.goal,
-    required this.index,
-  }) : super(key: key);
+    required goal,
+    required index,
+  }) : _goal = goal,
+        _index = index,
+        super(key: key);
 
   @override
-  State<CountdownElement> createState() => _CountdownElementState();
+  Widget build(BuildContext context) {
+    final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
+    return Container(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: <Widget>[
+            Text(
+              _goal.toString(),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            _CountdownText(goal: _goal),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                OutlinedButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => _CountdownView(goal: _goal),
+                  )),
+                  child: const Text(
+                    'See',
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () => _dateTimeList.removeAt(_index),
+                  child: const Text(
+                    'Remove',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        )
+    );
+  }
 }
 
 class _TimeWrapper extends ChangeNotifier {
@@ -235,15 +270,8 @@ class _DateTimeList extends ChangeNotifier {
   List<DateTime> get() => List.unmodifiable(_list);
 }
 
-class _CountdownListView extends StatefulWidget {
+class _CountdownListView extends StatelessWidget {
   const _CountdownListView({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _CountdownListViewState();
-
-}
-
-class _CountdownListViewState extends State<_CountdownListView> {
 
   @override
   Widget build(BuildContext context) {
@@ -260,46 +288,6 @@ class _CountdownListViewState extends State<_CountdownListView> {
               ),
             );
           }).toList(),
-        )
-    );
-  }
-
-}
-
-class _CountdownElementState extends State<CountdownElement> {
-
-  @override
-  Widget build(BuildContext context) {
-    final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
-    return Container(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          children: <Widget>[
-            Text(
-              widget.goal.toString(),
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            _CountdownText(goal: widget.goal),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                OutlinedButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => _CountdownView(goal: widget.goal),
-                  )),
-                  child: const Text(
-                    'See',
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: () => _dateTimeList.removeAt(widget.index),
-                  child: const Text(
-                    'Remove',
-                  ),
-                ),
-              ],
-            ),
-          ],
         )
     );
   }
@@ -339,22 +327,16 @@ class _CountdownView extends StatelessWidget {
 
 }
 
-class _CountdownText extends StatefulWidget {
-  final DateTime goal;
+class _CountdownText extends StatelessWidget {
+  final DateTime _goal;
 
-  const _CountdownText({Key? key, required this.goal}) : super(key: key);
+  const _CountdownText({Key? key, required goal}) : _goal = goal, super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => _CountdownTextState();
-
-}
-
-class _CountdownTextState extends State<_CountdownText> {
   @override
   Widget build(BuildContext context) {
     final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
     return Text(
-      _formatRemainingMicroSecond(_remainingMicroSecond(widget.goal, _timeWrapper.getDateTime())),
+      _formatRemainingMicroSecond(_remainingMicroSecond(_goal, _timeWrapper.getDateTime())),
       style: Theme.of(context).textTheme.headline4,
     );
   }
