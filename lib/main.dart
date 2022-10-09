@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:time_counter/goal.dart';
 
-void main() {
+const goalBoxName = 'goalBox';
+
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(GoalAdapter());
+  await Hive.openBox<Goal>(goalBoxName);
   runApp(
     ChangeNotifierProvider<_TimeWrapper>(
         create: (context) => _TimeWrapper(),
-        child: const MyApp()
+        child: const MyApp(),
     ),
   );
 }
@@ -255,19 +262,19 @@ class _TimeWrapper extends ChangeNotifier {
 }
 
 class _DateTimeList extends ChangeNotifier {
-  final List<DateTime> _list = [];
+  final _goalBox = Hive.box<Goal>(goalBoxName);
 
   void add(DateTime dateTime) {
-    _list.add(dateTime);
+    _goalBox.add(Goal(dateTime));
     notifyListeners();
   }
 
   void removeAt(int i) {
-    _list.removeAt(i);
+    _goalBox.deleteAt(i);
     notifyListeners();
   }
 
-  List<DateTime> get() => List.unmodifiable(_list);
+  List<DateTime> get() => List.unmodifiable(_goalBox.values.map((e) => e.endTime));
 }
 
 class _CountdownListView extends StatelessWidget {
