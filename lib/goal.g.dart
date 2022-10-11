@@ -17,16 +17,19 @@ class GoalAdapter extends TypeAdapter<Goal> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Goal(
-      fields[0] as DateTime,
+      endTime: fields[0] as DateTime,
+      title: fields[1] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Goal obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.endTime);
+      ..write(obj.endTime)
+      ..writeByte(1)
+      ..write(obj.title);
   }
 
   @override
