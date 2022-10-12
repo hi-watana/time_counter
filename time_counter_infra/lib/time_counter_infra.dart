@@ -3,6 +3,4 @@
 /// More dartdocs go here.
 library time_counter_infra;
 
-export 'src/time_counter_infra_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/goal.dart';

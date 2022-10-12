@@ -3,7 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-import 'goal.dart';
+import 'package:time_counter_infra/time_counter_infra.dart';
 
 const goalBoxName = 'goalBox';
 
