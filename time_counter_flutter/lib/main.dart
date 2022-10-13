@@ -12,42 +12,18 @@ void main() async {
   Hive.registerAdapter(GoalAdapter());
   await Hive.openBox<Goal>(goalBoxName);
   runApp(
-    ChangeNotifierProvider<_TimeWrapper>(
-        create: (context) => _TimeWrapper(),
-        child: const MyApp(),
-    ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<_TimeCounter>(create: (_) => _TimeCounter()),
+        ChangeNotifierProvider<_GoalList>(create: (_) => _GoalList()),
+      ],
+      child: const MyApp(),
+    )
   );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _MyAppState();
-
-}
-
-class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
-  late final Ticker _ticker;
-  _TimeWrapper? _timeWrapper;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_timeWrapper == null) {
-      _timeWrapper = Provider.of<_TimeWrapper>(context);
-      _ticker = createTicker((elapsed) {
-        _timeWrapper!.setTime(DateTime.now());
-      });
-      _ticker.start();
-    }
-  }
-
-  @override
-  void dispose() {
-    _ticker.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,15 +49,12 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: Center(
-        child: ChangeNotifierProvider<_GoalList>(
-          create: (context) => _GoalList(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: const <Widget>[
-              DateTimeSetter(),
-              _CountdownListView(),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: const <Widget>[
+            DateTimeSetter(),
+            _CountdownListView(),
+          ],
         ),
       ),
     );
@@ -304,12 +277,22 @@ class CountdownElement extends StatelessWidget {
   }
 }
 
-class _TimeWrapper extends ChangeNotifier {
+class _TimeCounter extends ChangeNotifier {
   DateTime _dateTime = DateTime.now();
+  late final Ticker _ticker;
 
-  void setTime(DateTime dateTime) {
-    _dateTime = dateTime;
-    notifyListeners();
+  _TimeCounter() {
+     _ticker = Ticker((_) {
+       _dateTime = DateTime.now();
+       notifyListeners();
+     });
+     _ticker.start();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _ticker.dispose();
   }
 
   DateTime getDateTime() => _dateTime;
@@ -411,8 +394,8 @@ class _CountdownText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
-    final int _remaining = _microSecondToSecond(_remainingMicroSecond(_goal, _timeWrapper.getDateTime()));
+    final _TimeCounter _timeCounter = Provider.of<_TimeCounter>(context);
+    final int _remaining = _microSecondToSecond(_remainingMicroSecond(_goal, _timeCounter.getDateTime()));
 
     if (_remaining < 1) {
       return Text(
@@ -426,9 +409,7 @@ class _CountdownText extends StatelessWidget {
     );
   }
 
-  int _remainingMicroSecond(DateTime _goal, DateTime _current) {
-    return _goal.microsecondsSinceEpoch - _current.microsecondsSinceEpoch;
-  }
+  int _remainingMicroSecond(DateTime _goal, DateTime _current) => _goal.microsecondsSinceEpoch - _current.microsecondsSinceEpoch;
 
   int _microSecondToSecond(int microSecond) => microSecond ~/ 1000000;
 
