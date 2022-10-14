@@ -3,19 +3,16 @@ import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-import 'package:time_counter_infra/time_counter_infra.dart';
-
-const goalBoxName = 'goalBox';
+import 'package:time_counter_infra/time_counter_library.dart';
 
 void main() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(GoalAdapter());
-  await Hive.openBox<Goal>(goalBoxName);
+  final goalBox = await openGoalBox();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<_TimeCounter>(create: (_) => _TimeCounter()),
-        ChangeNotifierProvider<_GoalList>(create: (_) => _GoalList()),
+        ChangeNotifierProvider<GoalList>(create: (context) => GoalList(GoalRepository(goalBox))),
       ],
       child: const MyApp(),
     )
@@ -92,7 +89,7 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
 
   @override
   Widget build(BuildContext context) {
-    final _GoalList _goalList = Provider.of<_GoalList>(context);
+    final GoalList _goalList = Provider.of<GoalList>(context);
 
     return Column(
       children: [
@@ -231,7 +228,7 @@ class CountdownElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _GoalList _goalList = Provider.of<_GoalList>(context);
+    final GoalList _goalList = Provider.of<GoalList>(context);
     return Container(
         padding: const EdgeInsets.all(8),
         child: Column(
@@ -298,28 +295,12 @@ class _TimeCounter extends ChangeNotifier {
   DateTime getDateTime() => _dateTime;
 }
 
-class _GoalList extends ChangeNotifier {
-  final _goalBox = Hive.box<Goal>(goalBoxName);
-
-  void add(Goal goal) {
-    _goalBox.add(goal);
-    notifyListeners();
-  }
-
-  void removeAt(int i) {
-    _goalBox.deleteAt(i);
-    notifyListeners();
-  }
-
-  List<Goal> get() => List.unmodifiable(_goalBox.values);
-}
-
 class _CountdownListView extends StatelessWidget {
   const _CountdownListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final _GoalList _goalList = Provider.of<_GoalList>(context);
+    final GoalList _goalList = Provider.of<GoalList>(context);
 
     return Expanded(
         child: ListView(
@@ -395,40 +376,35 @@ class _CountdownText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _TimeCounter _timeCounter = Provider.of<_TimeCounter>(context);
-    final int _remaining = _microSecondToSecond(_remainingMicroSecond(_goal, _timeCounter.getDateTime()));
+    final _remainingTime = RemainingTime(goal: _goal, current: _timeCounter.getDateTime());
 
-    if (_remaining < 1) {
+    if (_remainingTime.isTimeUp()) {
       return Text(
-        _formatRemainingSecond(0),
+        RemainingTime.zeroFormat,
         style: Theme.of(context).textTheme.headline4?.copyWith(color: Colors.red),
       );
     }
     return Text(
-      _formatRemainingSecond(_remaining),
+      _remainingTime.getStringFormat(),
       style: Theme.of(context).textTheme.headline4,
     );
   }
+}
 
-  int _remainingMicroSecond(DateTime _goal, DateTime _current) => _goal.microsecondsSinceEpoch - _current.microsecondsSinceEpoch;
+class GoalList extends ChangeNotifier {
+  final GoalRepository _goalRepository;
 
-  int _microSecondToSecond(int microSecond) => microSecond ~/ 1000000;
+  GoalList(this._goalRepository);
 
-  String _formatRemainingSecond(int remainingSecond) {
-    var minutes = remainingSecond ~/ 60;
-    remainingSecond %= 60;
-    var hours = minutes ~/ 60;
-    minutes %= 60;
-    var days = hours ~/ 24;
-    hours %= 24;
-    var weeks = days ~/ 7;
-    days %= 7;
-    var years = weeks ~/ 52;
-    weeks %= 52;
-    return years.toString().padLeft(4, '0') + '-'
-        + weeks.toString().padLeft(2, '0') + '-'
-        + days.toString().padLeft(1, '0') + '-'
-        + hours.toString().padLeft(2, '0') + '-'
-        + minutes.toString().padLeft(2, '0') + '-'
-        + remainingSecond.toString().padLeft(2, '0');
+  void add(Goal goal) {
+    _goalRepository.add(goal);
+    notifyListeners();
   }
+
+  void removeAt(int i) {
+    _goalRepository.removeAt(i);
+    notifyListeners();
+  }
+
+  List<Goal> get() => _goalRepository.get();
 }

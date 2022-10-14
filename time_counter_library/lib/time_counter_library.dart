@@ -4,3 +4,5 @@
 library time_counter_infra;
 
 export 'src/goal.dart';
+export 'src/goal_repository.dart';
+export 'src/countdown_calculator.dart';
