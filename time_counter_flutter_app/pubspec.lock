@@ -520,7 +520,14 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.12"
-  time_counter_infra:
+  time_counter_flutter_library:
+    dependency: "direct main"
+    description:
+      path: "../time_counter_flutter_library"
+      relative: true
+    source: path
+    version: "0.0.1"
+  time_counter_library:
     dependency: "direct main"
     description:
       path: "../time_counter_library"

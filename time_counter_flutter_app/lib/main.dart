@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-import 'package:time_counter_infra/time_counter_library.dart';
+import 'package:time_counter_library/time_counter_library.dart';
+import 'package:time_counter_flutter_library/time_counter_flutter_library.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -11,7 +11,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<_TimeCounter>(create: (_) => _TimeCounter()),
+        ChangeNotifierProvider<TimeCounter>(create: (_) => TimeCounter()),
         ChangeNotifierProvider<GoalList>(create: (context) => GoalList(GoalRepository(goalBox))),
       ],
       child: const MyApp(),
@@ -274,27 +274,6 @@ class CountdownElement extends StatelessWidget {
   }
 }
 
-class _TimeCounter extends ChangeNotifier {
-  DateTime _dateTime = DateTime.now();
-  late final Ticker _ticker;
-
-  _TimeCounter() {
-     _ticker = Ticker((_) {
-       _dateTime = DateTime.now();
-       notifyListeners();
-     });
-     _ticker.start();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _ticker.dispose();
-  }
-
-  DateTime getDateTime() => _dateTime;
-}
-
 class _CountdownListView extends StatelessWidget {
   const _CountdownListView({Key? key}) : super(key: key);
 
@@ -375,7 +354,7 @@ class _CountdownText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _TimeCounter _timeCounter = Provider.of<_TimeCounter>(context);
+    final TimeCounter _timeCounter = Provider.of<TimeCounter>(context);
     final _remainingTime = RemainingTime(goal: _goal, current: _timeCounter.getDateTime());
 
     if (_remainingTime.isTimeUp()) {
@@ -389,22 +368,4 @@ class _CountdownText extends StatelessWidget {
       style: Theme.of(context).textTheme.headline4,
     );
   }
-}
-
-class GoalList extends ChangeNotifier {
-  final GoalRepository _goalRepository;
-
-  GoalList(this._goalRepository);
-
-  void add(Goal goal) {
-    _goalRepository.add(goal);
-    notifyListeners();
-  }
-
-  void removeAt(int i) {
-    _goalRepository.removeAt(i);
-    notifyListeners();
-  }
-
-  List<Goal> get() => _goalRepository.get();
 }
