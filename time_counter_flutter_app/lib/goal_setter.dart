@@ -41,6 +41,7 @@ class _GoalSubmitter extends StatelessWidget {
           endTime: context.read<SelectedTime>().get(),
           description: _titleController.text,
         ));
+        Navigator.pop(context);
       } : null,
       child: const Text(
         'Add',

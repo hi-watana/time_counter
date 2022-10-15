@@ -67,16 +67,14 @@ class CountdownListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      child: ListView(
-        children: context.watch<GoalList>().get().asMap().entries.map((e) {
-          return _CountdownElement(
-            endTime: e.value.endTime,
-            description: e.value.description,
-            index: e.key,
-          );
-        }).toList(),
-      ),
+    return ListView(
+      children: context.watch<GoalList>().get().asMap().entries.map((e) {
+        return _CountdownElement(
+          endTime: e.value.endTime,
+          description: e.value.description,
+          index: e.key,
+        );
+      }).toList(),
     );
   }
 }
