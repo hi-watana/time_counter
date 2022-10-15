@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-
+import 'package:time_counter_flutter_library/selected_time.dart';
 import 'package:time_counter_library/time_counter_library.dart';
-import 'package:time_counter_flutter_library/time_counter_flutter_library.dart';
+import 'package:time_counter_flutter_library/goal_list.dart';
+import 'package:time_counter_flutter_library/time_counter.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -12,7 +13,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<TimeCounter>(create: (_) => TimeCounter()),
-        ChangeNotifierProvider<GoalList>(create: (context) => GoalList(GoalRepository(goalBox))),
+        ChangeNotifierProvider<GoalList>(create: (_) => GoalList(GoalRepository(goalBox))),
+        ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
       ],
       child: const MyApp(),
     )
@@ -49,7 +51,7 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: const <Widget>[
-            DateTimeSetter(),
+            GoalSetter(),
             _CountdownListView(),
           ],
         ),
@@ -58,79 +60,64 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class DateTimeSetter extends StatefulWidget {
+class GoalSetter extends StatefulWidget {
 
-  const DateTimeSetter({Key? key}) : super(key: key);
+  const GoalSetter({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _DateTimeSetterState();
+  State<StatefulWidget> createState() => _GoalSetterState();
 }
 
-class _DateTimeSetterState extends State<DateTimeSetter> {
+class _DateTimeSetter extends StatelessWidget {
+
+  const _DateTimeSetter({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _selectedTime = Provider.of<SelectedTime>(context);
+
+    return Row(
+      children: [
+        OutlinedButton(
+          onPressed: () => _selectedTime.setDate(context),
+          child: const Text(
+            'Date',
+          ),
+        ),
+        OutlinedButton(
+          onPressed: () => _selectedTime.setTime(context),
+          child: const Text(
+            'Time',
+          ),
+        ),
+        Text(_selectedTime.get().toString()),
+      ],
+    );
+  }
+}
+
+class _GoalSetterState extends State<GoalSetter> {
 
   static const int maxTitleLength = 60;
-  static const Duration _lastDateDuration = Duration(days: 50000);
 
   final TextEditingController _titleController = TextEditingController();
 
   late bool _isAddButtonEnabled;
-  late DateTime _pickedDateTime;
 
   @override
   void initState() {
     super.initState();
     _isAddButtonEnabled = _titleController.text.isNotEmpty;
-    final _now = DateTime.now();
-    final _time = TimeOfDay.fromDateTime(_now.add(Duration(hours: 1))).replacing(minute: 0);
-    _pickedDateTime = DateTime(_now.year, _now.month, _now.day, _time.hour, _time.minute);
-  }
-
-  Future<DateTime?> _pickDate() async {
-    final now = DateTime.now();
-    return await showDatePicker(context: context, initialDate: _pickedDateTime, firstDate: now, lastDate: now.add(_lastDateDuration));
-  }
-  
-  Future<TimeOfDay?> _pickTime() async {
-    return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_pickedDateTime));
   }
 
   @override
   Widget build(BuildContext context) {
     final GoalList _goalList = Provider.of<GoalList>(context);
+    final SelectedTime _selectedTime = Provider.of<SelectedTime>(context);
 
     return Column(
       children: [
-        Row(
-          children: [
-            OutlinedButton(
-              onPressed: () async {
-                final date = await _pickDate();
-                if (date != null) {
-                  setState(() {
-                    _pickedDateTime = DateTime(date.year, date.month, date.day, _pickedDateTime.hour, _pickedDateTime.month);
-                  });
-                }
-              },
-              child: const Text(
-                'Date',
-              ),
-            ),
-            OutlinedButton(
-              onPressed: () async {
-                final time = await _pickTime();
-                if (time != null) {
-                  setState(() {
-                    _pickedDateTime = DateTime(_pickedDateTime.year, _pickedDateTime.month, _pickedDateTime.day, time.hour, time.minute);
-                  });
-                }
-              },
-              child: const Text(
-                'Time',
-              ),
-            ),
-            Text(_pickedDateTime.toString()),
-          ],
-        ),
+        _DateTimeSetter(),
         Container(
           margin: const EdgeInsets.only(left: 12, right: 12),
           child: TextField(
@@ -149,11 +136,8 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
         ),
         OutlinedButton(
           onPressed: _isAddButtonEnabled ? () {
-            //final int hour = int.parse(_hourController.text);
-            //final int minute = int.parse(_minuteController.text);
-            //final int second = int.parse(_secondController.text);
             _goalList.add(Goal(
-              endTime: _pickedDateTime,
+              endTime: _selectedTime.get(),
               title: _titleController.text,
             ));
           } : null,
