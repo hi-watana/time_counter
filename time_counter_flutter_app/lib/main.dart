@@ -69,22 +69,29 @@ class DateTimeSetter extends StatefulWidget {
 class _DateTimeSetterState extends State<DateTimeSetter> {
 
   static const int maxTitleLength = 60;
-
-  final TextEditingController _yearController = TextEditingController();
-  final TextEditingController _monthController = TextEditingController();
-  final TextEditingController _dayController = TextEditingController();
-  final TextEditingController _hourController = TextEditingController();
-  final TextEditingController _minuteController = TextEditingController();
-  final TextEditingController _secondController = TextEditingController();
+  static const Duration _lastDateDuration = Duration(days: 50000);
 
   final TextEditingController _titleController = TextEditingController();
 
   late bool _isAddButtonEnabled;
+  late DateTime _pickedDateTime;
 
   @override
   void initState() {
     super.initState();
     _isAddButtonEnabled = _titleController.text.isNotEmpty;
+    final _now = DateTime.now();
+    final _time = TimeOfDay.fromDateTime(_now.add(Duration(hours: 1))).replacing(minute: 0);
+    _pickedDateTime = DateTime(_now.year, _now.month, _now.day, _time.hour, _time.minute);
+  }
+
+  Future<DateTime?> _pickDate() async {
+    final now = DateTime.now();
+    return await showDatePicker(context: context, initialDate: _pickedDateTime, firstDate: now, lastDate: now.add(_lastDateDuration));
+  }
+  
+  Future<TimeOfDay?> _pickTime() async {
+    return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_pickedDateTime));
   }
 
   @override
@@ -95,40 +102,33 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
       children: [
         Row(
           children: [
-            _PaddedTextField(
-              maxLength: 4,
-              hintText: 'yyyy',
-              controller: _yearController,
+            OutlinedButton(
+              onPressed: () async {
+                final date = await _pickDate();
+                if (date != null) {
+                  setState(() {
+                    _pickedDateTime = DateTime(date.year, date.month, date.day, _pickedDateTime.hour, _pickedDateTime.month);
+                  });
+                }
+              },
+              child: const Text(
+                'Date',
+              ),
             ),
-            _PaddedTextField(
-              maxLength: 2,
-              hintText: 'MM',
-              controller: _monthController,
+            OutlinedButton(
+              onPressed: () async {
+                final time = await _pickTime();
+                if (time != null) {
+                  setState(() {
+                    _pickedDateTime = DateTime(_pickedDateTime.year, _pickedDateTime.month, _pickedDateTime.day, time.hour, time.minute);
+                  });
+                }
+              },
+              child: const Text(
+                'Time',
+              ),
             ),
-            _PaddedTextField(
-              maxLength: 2,
-              hintText: 'dd',
-              controller: _dayController,
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            _PaddedTextField(
-              maxLength: 2,
-              hintText: 'hh',
-              controller: _hourController,
-            ),
-            _PaddedTextField(
-              maxLength: 2,
-              hintText: 'mm',
-              controller: _minuteController,
-            ),
-            _PaddedTextField(
-              maxLength: 2,
-              hintText: 'ss',
-              controller: _secondController,
-            ),
+            Text(_pickedDateTime.toString()),
           ],
         ),
         Container(
@@ -143,22 +143,17 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
               hintText: 'title',
             ),
             onChanged: (text) {
-              setState(() {
-                _isAddButtonEnabled = text.isNotEmpty;
-              });
+              setState(() => _isAddButtonEnabled = text.isNotEmpty);
             },
           ),
         ),
         OutlinedButton(
           onPressed: _isAddButtonEnabled ? () {
-            final int year = int.parse(_yearController.text);
-            final int month = int.parse(_monthController.text);
-            final int day = int.parse(_dayController.text);
-            final int hour = int.parse(_hourController.text);
-            final int minute = int.parse(_minuteController.text);
-            final int second = int.parse(_secondController.text);
+            //final int hour = int.parse(_hourController.text);
+            //final int minute = int.parse(_minuteController.text);
+            //final int second = int.parse(_secondController.text);
             _goalList.add(Goal(
-              endTime: DateTime(year, month, day, hour, minute, second),
+              endTime: _pickedDateTime,
               title: _titleController.text,
             ));
           } : null,
@@ -169,46 +164,6 @@ class _DateTimeSetterState extends State<DateTimeSetter> {
       ],
     );
   }
-}
-
-class _PaddedTextField extends StatelessWidget {
-
-  final int _maxLength;
-  final String _hintText;
-  final TextEditingController _controller;
-
-  const _PaddedTextField({
-    Key? key,
-    required maxLength,
-    required hintText,
-    required controller,
-  }) : _maxLength = maxLength,
-        _hintText = hintText,
-        _controller = controller,
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      child: Container(
-        margin: const EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 20,
-        ),
-        child: TextField(
-          enabled: true,
-          maxLength: _maxLength,
-          maxLines: 1,
-          textAlign: TextAlign.right,
-          controller: _controller,
-          decoration: InputDecoration(
-            hintText: _hintText,
-          ),
-        ),
-      ),
-    );
-  }
-
 }
 
 class CountdownElement extends StatelessWidget {
