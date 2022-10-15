@@ -6,62 +6,58 @@ import 'package:time_counter_library/time_counter_library.dart';
 
 class _CountdownElement extends StatelessWidget {
   final DateTime _endTime;
-  final String _title;
+  final String _description;
   final int _index;
 
   const _CountdownElement({
     Key? key,
     required endTime,
-    required title,
+    required description,
     required index,
   }) : _endTime = endTime,
-        _title = title,
+        _description = description,
         _index = index,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.topLeft,
-              margin: const EdgeInsets.all(8),
-              child: Text(
-                _title.toString(),
-                style: Theme.of(context).textTheme.headline6,
+    return Dismissible(
+        key: UniqueKey(),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          color: Colors.red,
+          alignment: AlignmentDirectional.centerEnd,
+          padding: const EdgeInsets.only(
+            right: 10,
+          ),
+          child: const Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ),
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(_endTime.toString()),
+                subtitle: Text(
+                  _description,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            Text(
-              _endTime.toString(),
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            _CountdownText(goal: _endTime),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                OutlinedButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => _CountdownView(
-                      endTime: _endTime,
-                      title: _title,
-                    ),
-                  )),
-                  child: const Text(
-                    'See',
-                  ),
+              Container(
+                padding: const EdgeInsets.only(
+                  bottom: 10,
                 ),
-                OutlinedButton(
-                  onPressed: () => context.read<GoalList>().removeAt(_index),
-                  child: const Text(
-                    'Remove',
-                  ),
-                ),
-              ],
-            ),
-          ],
-        )
+                child: _CountdownText(goal: _endTime),
+              )
+            ],
+          ),
+        ),
+      onDismissed: (direction) {
+        context.read<GoalList>().removeAt(_index);
+      },
     );
   }
 }
@@ -71,19 +67,16 @@ class CountdownListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: ListView(
-          padding: const EdgeInsets.all(8),
-          children: context.watch<GoalList>().get().asMap().entries.map((e) {
-            return Center(
-              child: _CountdownElement(
-                endTime: e.value.endTime,
-                title: e.value.title,
-                index: e.key,
-              ),
-            );
-          }).toList(),
-        )
+    return Flexible(
+      child: ListView(
+        children: context.watch<GoalList>().get().asMap().entries.map((e) {
+          return _CountdownElement(
+            endTime: e.value.endTime,
+            description: e.value.description,
+            index: e.key,
+          );
+        }).toList(),
+      ),
     );
   }
 }
@@ -109,53 +102,4 @@ class _CountdownText extends StatelessWidget {
       style: Theme.of(context).textTheme.headline4,
     );
   }
-}
-
-class _CountdownView extends StatelessWidget {
-  final DateTime _endTime;
-  final String _title;
-
-  const _CountdownView({
-    Key? key,
-    required endTime,
-    required title,
-  }) : _endTime = endTime,
-        _title = title,
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Countdown'),
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              alignment: Alignment.topLeft,
-              margin: const EdgeInsets.all(8),
-              child: Text(
-                _title.toString(),
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Text(
-              _endTime.toString(),
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            _CountdownText(goal: _endTime),
-          ],
-        ),
-      ),
-    );
-  }
-
 }

@@ -39,7 +39,7 @@ class _GoalSubmitter extends StatelessWidget {
       onPressed: _titleController.text.isNotEmpty ? () {
         context.read<GoalList>().add(Goal(
           endTime: context.read<SelectedTime>().get(),
-          title: _titleController.text,
+          description: _titleController.text,
         ));
       } : null,
       child: const Text(
