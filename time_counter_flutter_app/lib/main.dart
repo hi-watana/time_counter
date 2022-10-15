@@ -70,7 +70,18 @@ class GoalSetter extends StatefulWidget {
 
 class _DateTimeSetter extends StatelessWidget {
 
+  static const Duration _lastDateDuration = Duration(days: 50000);
+
   const _DateTimeSetter({Key? key}) : super(key: key);
+
+  Future<DateTime?> _pickDate(BuildContext context, DateTime _selectedTime) async {
+    final now = DateTime.now();
+    return await showDatePicker(context: context, initialDate: _selectedTime, firstDate: now, lastDate: now.add(_lastDateDuration));
+  }
+
+  Future<TimeOfDay?> _pickTime(BuildContext context, DateTime _selectedTime) async {
+    return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_selectedTime));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +90,17 @@ class _DateTimeSetter extends StatelessWidget {
     return Row(
       children: [
         OutlinedButton(
-          onPressed: () => _selectedTime.setDate(context),
+          onPressed: () async {
+            _selectedTime.setDate(await _pickDate(context, _selectedTime.get()));
+          },
           child: const Text(
             'Date',
           ),
         ),
         OutlinedButton(
-          onPressed: () => _selectedTime.setTime(context),
+          onPressed: () async {
+            _selectedTime.setTime(await _pickTime(context, _selectedTime.get()));
+          },
           child: const Text(
             'Time',
           ),
