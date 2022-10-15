@@ -14,7 +14,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider<TimeCounter>(create: (_) => TimeCounter()),
         ChangeNotifierProvider<GoalList>(create: (_) => GoalList(GoalRepository(goalBox))),
-        ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
       ],
       child: const MyApp(),
     )
@@ -50,8 +49,14 @@ class MyHomePage extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: const <Widget>[
-            GoalSetter(),
+          children: <Widget>[
+            MultiProvider(
+              providers: [
+                ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
+                ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController()),
+              ],
+              child: GoalSetter(),
+            ),
             _CountdownListView(),
           ],
         ),
@@ -60,24 +65,97 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class GoalSetter extends StatefulWidget {
+class GoalSetter extends StatelessWidget {
 
   const GoalSetter({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _GoalSetterState();
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _DateTimeSetter(),
+        _TitleSetter(),
+        _GoalSubmitter(),
+      ],
+    );
+  }
 }
 
-class _DateTimeSetter extends StatelessWidget {
+class _GoalSubmitter extends StatelessWidget {
+  const _GoalSubmitter({Key? key}) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    final _titleController = context.watch<TextEditingController>();
+
+    return OutlinedButton(
+      onPressed: _titleController.text.isNotEmpty ? () {
+        context.read<GoalList>().add(Goal(
+          endTime: context.read<SelectedTime>().get(),
+          title: _titleController.text,
+        ));
+      } : null,
+      child: const Text(
+        'Add',
+      ),
+    );
+  }
+}
+
+class _TitleSetter extends StatelessWidget {
+
+  static const int maxTitleLength = 60;
+
+  const _TitleSetter({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 12, right: 12),
+      child: TextField(
+        enabled: true,
+        maxLength: maxTitleLength,
+        maxLines: 1,
+        textAlign: TextAlign.left,
+        controller: context.read<TextEditingController>(),
+        decoration: const InputDecoration(
+          hintText: 'title',
+        ),
+      ),
+    );
+  }
+}
+
+class _DateSelector extends StatelessWidget {
   static const Duration _lastDateDuration = Duration(days: 50000);
 
-  const _DateTimeSetter({Key? key}) : super(key: key);
+  final SelectedTime _selectedTime;
+
+  const _DateSelector(this._selectedTime, {Key? key}) : super(key: key);
 
   Future<DateTime?> _pickDate(BuildContext context, DateTime _selectedTime) async {
     final now = DateTime.now();
     return await showDatePicker(context: context, initialDate: _selectedTime, firstDate: now, lastDate: now.add(_lastDateDuration));
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: () async {
+        _selectedTime.setDate(await _pickDate(context, _selectedTime.get()));
+      },
+      child: const Text(
+        'Date',
+      ),
+    );
+  }
+
+}
+
+class _TimeSelector extends StatelessWidget {
+  final SelectedTime _selectedTime;
+
+  const _TimeSelector(this._selectedTime, {Key? key}) : super(key: key);
 
   Future<TimeOfDay?> _pickTime(BuildContext context, DateTime _selectedTime) async {
     return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_selectedTime));
@@ -85,81 +163,31 @@ class _DateTimeSetter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedTime = Provider.of<SelectedTime>(context);
-
-    return Row(
-      children: [
-        OutlinedButton(
-          onPressed: () async {
-            _selectedTime.setDate(await _pickDate(context, _selectedTime.get()));
-          },
-          child: const Text(
-            'Date',
-          ),
-        ),
-        OutlinedButton(
-          onPressed: () async {
-            _selectedTime.setTime(await _pickTime(context, _selectedTime.get()));
-          },
-          child: const Text(
-            'Time',
-          ),
-        ),
-        Text(_selectedTime.get().toString()),
-      ],
+    return OutlinedButton(
+      onPressed: () async {
+        _selectedTime.setTime(await _pickTime(context, _selectedTime.get()));
+      },
+      child: const Text(
+        'Time',
+      ),
     );
   }
+
 }
 
-class _GoalSetterState extends State<GoalSetter> {
+class _DateTimeSetter extends StatelessWidget {
 
-  static const int maxTitleLength = 60;
-
-  final TextEditingController _titleController = TextEditingController();
-
-  late bool _isAddButtonEnabled;
-
-  @override
-  void initState() {
-    super.initState();
-    _isAddButtonEnabled = _titleController.text.isNotEmpty;
-  }
+  const _DateTimeSetter({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final GoalList _goalList = Provider.of<GoalList>(context);
-    final SelectedTime _selectedTime = Provider.of<SelectedTime>(context);
+    final _selectedTime = context.watch<SelectedTime>();
 
-    return Column(
+    return Row(
       children: [
-        _DateTimeSetter(),
-        Container(
-          margin: const EdgeInsets.only(left: 12, right: 12),
-          child: TextField(
-            enabled: true,
-            maxLength: maxTitleLength,
-            maxLines: 1,
-            textAlign: TextAlign.left,
-            controller: _titleController,
-            decoration: const InputDecoration(
-              hintText: 'title',
-            ),
-            onChanged: (text) {
-              setState(() => _isAddButtonEnabled = text.isNotEmpty);
-            },
-          ),
-        ),
-        OutlinedButton(
-          onPressed: _isAddButtonEnabled ? () {
-            _goalList.add(Goal(
-              endTime: _selectedTime.get(),
-              title: _titleController.text,
-            ));
-          } : null,
-          child: const Text(
-            'Add',
-          ),
-        ),
+        _DateSelector(_selectedTime),
+        _TimeSelector(_selectedTime),
+        Text(_selectedTime.get().toString()),
       ],
     );
   }
@@ -182,7 +210,6 @@ class CountdownElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoalList _goalList = Provider.of<GoalList>(context);
     return Container(
         padding: const EdgeInsets.all(8),
         child: Column(
@@ -215,7 +242,7 @@ class CountdownElement extends StatelessWidget {
                   ),
                 ),
                 OutlinedButton(
-                  onPressed: () => _goalList.removeAt(_index),
+                  onPressed: () => context.read<GoalList>().removeAt(_index),
                   child: const Text(
                     'Remove',
                   ),
@@ -233,12 +260,10 @@ class _CountdownListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoalList _goalList = Provider.of<GoalList>(context);
-
     return Expanded(
         child: ListView(
           padding: const EdgeInsets.all(8),
-          children: _goalList.get().asMap().entries.map((e) {
+          children: context.watch<GoalList>().get().asMap().entries.map((e) {
             return Center(
               child: CountdownElement(
                 endTime: e.value.endTime,
@@ -308,7 +333,7 @@ class _CountdownText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TimeCounter _timeCounter = Provider.of<TimeCounter>(context);
+    final TimeCounter _timeCounter = context.watch<TimeCounter>();
     final _remainingTime = RemainingTime(goal: _goal, current: _timeCounter.getDateTime());
 
     if (_remainingTime.isTimeUp()) {

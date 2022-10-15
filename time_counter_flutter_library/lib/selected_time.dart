@@ -14,15 +14,15 @@ class SelectedTime extends ChangeNotifier {
   void setDate(DateTime? date) async {
     if (date != null) {
       _selectedTime = DateTime(date.year, date.month, date.day, _selectedTime.hour, _selectedTime.minute);
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void setTime(TimeOfDay? time) async {
     if (time != null) {
       _selectedTime = DateTime(_selectedTime.year, _selectedTime.month, _selectedTime.day, time.hour, time.minute);
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   DateTime get() => _selectedTime;
