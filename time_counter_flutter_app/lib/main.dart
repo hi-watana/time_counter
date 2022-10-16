@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -28,12 +29,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Countdown',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Countdown'),
+    return DynamicColorBuilder(
+      builder: (lightDynamic, darkDynamic) {
+        return MaterialApp(
+          title: 'Countdown',
+          theme: _lightTheme(lightDynamic),
+          darkTheme: _darkTheme(darkDynamic),
+          themeMode: ThemeMode.system,
+          home: const MyHomePage(title: 'Countdown'),
+        );
+      }
     );
   }
 }
@@ -78,4 +83,21 @@ class MyHomePage extends StatelessWidget {
       ),
     );
   }
+}
+
+ThemeData _lightTheme(ColorScheme? lightColorScheme) {
+  final scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFFA4EAA4));
+  return ThemeData.light(useMaterial3: true).copyWith(
+    colorScheme: scheme,
+  );
+}
+
+ThemeData _darkTheme(ColorScheme? darkColorScheme) {
+  final scheme = darkColorScheme ?? ColorScheme.fromSeed(
+    seedColor: const Color(0xFF2D442B),
+    brightness: Brightness.dark,
+  );
+  return ThemeData.dark(useMaterial3: true).copyWith(
+    colorScheme: scheme,
+  );
 }

@@ -26,14 +26,12 @@ class _CountdownElement extends StatelessWidget {
         key: UniqueKey(),
         direction: DismissDirection.endToStart,
         background: Container(
-          color: Colors.red,
           alignment: AlignmentDirectional.centerEnd,
           padding: const EdgeInsets.only(
-            right: 10,
+            right: 20,
           ),
           child: const Icon(
             Icons.delete,
-            color: Colors.white,
           ),
         ),
         child: Card(
@@ -89,16 +87,16 @@ class _CountdownText extends StatelessWidget {
   Widget build(BuildContext context) {
     final TimeCounter _timeCounter = context.watch<TimeCounter>();
     final _remainingTime = RemainingTime(goal: _goal, current: _timeCounter.getDateTime());
-
+    final _headline4 = Theme.of(context).textTheme.headline4;
     if (_remainingTime.isTimeUp()) {
       return Text(
-        RemainingTime.zeroFormat,
-        style: Theme.of(context).textTheme.headline4?.copyWith(color: Colors.red),
+        _remainingTime.getStringFormat(),
+        style: _headline4?.copyWith(color: _headline4.color?.withAlpha(60)),
       );
     }
     return Text(
       _remainingTime.getStringFormat(),
-      style: Theme.of(context).textTheme.headline4,
+      style: _headline4,
     );
   }
 }
