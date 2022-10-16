@@ -411,8 +411,16 @@ class _CountdownText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _TimeWrapper _timeWrapper = Provider.of<_TimeWrapper>(context);
+    final int _remaining = _microSecondToSecond(_remainingMicroSecond(_goal, _timeWrapper.getDateTime()));
+
+    if (_remaining < 1) {
+      return Text(
+        _formatRemainingSecond(0),
+        style: Theme.of(context).textTheme.headline4?.copyWith(color: Colors.red),
+      );
+    }
     return Text(
-      _formatRemainingMicroSecond(_remainingMicroSecond(_goal, _timeWrapper.getDateTime())),
+      _formatRemainingSecond(_remaining),
       style: Theme.of(context).textTheme.headline4,
     );
   }
@@ -421,10 +429,11 @@ class _CountdownText extends StatelessWidget {
     return _goal.microsecondsSinceEpoch - _current.microsecondsSinceEpoch;
   }
 
-  String _formatRemainingMicroSecond(int remainingMicroSecond) {
-    var seconds = remainingMicroSecond ~/ 1000000;
-    var minutes = seconds ~/ 60;
-    seconds %= 60;
+  int _microSecondToSecond(int microSecond) => microSecond ~/ 1000000;
+
+  String _formatRemainingSecond(int remainingSecond) {
+    var minutes = remainingSecond ~/ 60;
+    remainingSecond %= 60;
     var hours = minutes ~/ 60;
     minutes %= 60;
     var days = hours ~/ 24;
@@ -438,6 +447,6 @@ class _CountdownText extends StatelessWidget {
         + days.toString().padLeft(1, '0') + '-'
         + hours.toString().padLeft(2, '0') + '-'
         + minutes.toString().padLeft(2, '0') + '-'
-        + seconds.toString().padLeft(2, '0');
+        + remainingSecond.toString().padLeft(2, '0');
   }
 }
