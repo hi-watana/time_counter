@@ -6,5 +6,11 @@ class Goal {
   @HiveField(0)
   final DateTime endTime;
 
-  Goal(this.endTime);
+  @HiveField(1)
+  final String title;
+
+  Goal({
+    required this.endTime,
+    required this.title,
+  });
 }

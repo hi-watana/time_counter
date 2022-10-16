@@ -72,13 +72,13 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: Center(
-        child: ChangeNotifierProvider<_DateTimeList>(
-          create: (context) => _DateTimeList(),
+        child: ChangeNotifierProvider<_GoalList>(
+          create: (context) => _GoalList(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
+            children: const <Widget>[
               DateTimeSetter(),
-              const _CountdownListView(),
+              _CountdownListView(),
             ],
           ),
         ),
@@ -87,7 +87,17 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class DateTimeSetter extends StatelessWidget {
+class DateTimeSetter extends StatefulWidget {
+
+  const DateTimeSetter({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _DateTimeSetterState();
+}
+
+class _DateTimeSetterState extends State<DateTimeSetter> {
+
+  static const int maxTitleLength = 60;
 
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _monthController = TextEditingController();
@@ -96,11 +106,19 @@ class DateTimeSetter extends StatelessWidget {
   final TextEditingController _minuteController = TextEditingController();
   final TextEditingController _secondController = TextEditingController();
 
-  DateTimeSetter({Key? key}) : super(key: key);
+  final TextEditingController _titleController = TextEditingController();
+
+  late bool _isAddButtonEnabled;
+
+  @override
+  void initState() {
+    super.initState();
+    _isAddButtonEnabled = _titleController.text.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final _DateTimeList _countDownList = Provider.of<_DateTimeList>(context);
+    final _GoalList _goalList = Provider.of<_GoalList>(context);
 
     return Column(
       children: [
@@ -142,19 +160,40 @@ class DateTimeSetter extends StatelessWidget {
             ),
           ],
         ),
-        OutlinedButton(
-            onPressed: () {
-              final int year = int.parse(_yearController.text);
-              final int month = int.parse(_monthController.text);
-              final int day = int.parse(_dayController.text);
-              final int hour = int.parse(_hourController.text);
-              final int minute = int.parse(_minuteController.text);
-              final int second = int.parse(_secondController.text);
-              _countDownList.add(DateTime(year, month, day, hour, minute, second));
+        Container(
+          margin: const EdgeInsets.only(left: 12, right: 12),
+          child: TextField(
+            enabled: true,
+            maxLength: maxTitleLength,
+            maxLines: 1,
+            textAlign: TextAlign.left,
+            controller: _titleController,
+            decoration: const InputDecoration(
+              hintText: 'title',
+            ),
+            onChanged: (text) {
+              setState(() {
+                _isAddButtonEnabled = text.isNotEmpty;
+              });
             },
-            child: const Text(
-              'Add',
-            )
+          ),
+        ),
+        OutlinedButton(
+          onPressed: _isAddButtonEnabled ? () {
+            final int year = int.parse(_yearController.text);
+            final int month = int.parse(_monthController.text);
+            final int day = int.parse(_dayController.text);
+            final int hour = int.parse(_hourController.text);
+            final int minute = int.parse(_minuteController.text);
+            final int second = int.parse(_secondController.text);
+            _goalList.add(Goal(
+              endTime: DateTime(year, month, day, hour, minute, second),
+              title: _titleController.text,
+            ));
+          } : null,
+          child: const Text(
+            'Add',
+          ),
         ),
       ],
     );
@@ -202,42 +241,56 @@ class _PaddedTextField extends StatelessWidget {
 }
 
 class CountdownElement extends StatelessWidget {
-  final DateTime _goal;
+  final DateTime _endTime;
+  final String _title;
   final int _index;
 
   const CountdownElement({
     Key? key,
-    required goal,
+    required endTime,
+    required title,
     required index,
-  }) : _goal = goal,
+  }) : _endTime = endTime,
+        _title = title,
         _index = index,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
+    final _GoalList _goalList = Provider.of<_GoalList>(context);
     return Container(
         padding: const EdgeInsets.all(8),
         child: Column(
           children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              margin: const EdgeInsets.all(8),
+              child: Text(
+                _title.toString(),
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
             Text(
-              _goal.toString(),
+              _endTime.toString(),
               style: Theme.of(context).textTheme.headline6,
             ),
-            _CountdownText(goal: _goal),
+            _CountdownText(goal: _endTime),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 OutlinedButton(
                   onPressed: () => Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => _CountdownView(goal: _goal),
+                    builder: (context) => _CountdownView(
+                      endTime: _endTime,
+                      title: _title,
+                    ),
                   )),
                   child: const Text(
                     'See',
                   ),
                 ),
                 OutlinedButton(
-                  onPressed: () => _dateTimeList.removeAt(_index),
+                  onPressed: () => _goalList.removeAt(_index),
                   child: const Text(
                     'Remove',
                   ),
@@ -261,11 +314,11 @@ class _TimeWrapper extends ChangeNotifier {
   DateTime getDateTime() => _dateTime;
 }
 
-class _DateTimeList extends ChangeNotifier {
+class _GoalList extends ChangeNotifier {
   final _goalBox = Hive.box<Goal>(goalBoxName);
 
-  void add(DateTime dateTime) {
-    _goalBox.add(Goal(dateTime));
+  void add(Goal goal) {
+    _goalBox.add(goal);
     notifyListeners();
   }
 
@@ -274,7 +327,7 @@ class _DateTimeList extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<DateTime> get() => List.unmodifiable(_goalBox.values.map((e) => e.endTime));
+  List<Goal> get() => List.unmodifiable(_goalBox.values);
 }
 
 class _CountdownListView extends StatelessWidget {
@@ -282,15 +335,16 @@ class _CountdownListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _DateTimeList _dateTimeList = Provider.of<_DateTimeList>(context);
+    final _GoalList _goalList = Provider.of<_GoalList>(context);
 
     return Expanded(
         child: ListView(
           padding: const EdgeInsets.all(8),
-          children: _dateTimeList.get().asMap().entries.map((e) {
+          children: _goalList.get().asMap().entries.map((e) {
             return Center(
               child: CountdownElement(
-                goal: e.value,
+                endTime: e.value.endTime,
+                title: e.value.title,
                 index: e.key,
               ),
             );
@@ -301,9 +355,16 @@ class _CountdownListView extends StatelessWidget {
 }
 
 class _CountdownView extends StatelessWidget {
-  final DateTime _goal;
+  final DateTime _endTime;
+  final String _title;
 
-  const _CountdownView({Key? key, required goal}) : _goal = goal, super(key: key);
+  const _CountdownView({
+    Key? key,
+    required endTime,
+    required title,
+  }) : _endTime = endTime,
+        _title = title,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -321,11 +382,19 @@ class _CountdownView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              margin: const EdgeInsets.all(8),
+              child: Text(
+                _title.toString(),
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
             Text(
-              _goal.toString(),
+              _endTime.toString(),
               style: Theme.of(context).textTheme.headline6,
             ),
-            _CountdownText(goal: _goal),
+            _CountdownText(goal: _endTime),
           ],
         ),
       ),
