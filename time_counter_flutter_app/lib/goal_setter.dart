@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/selected_time.dart';
@@ -38,7 +39,7 @@ class _GoalSubmitter extends StatelessWidget {
     return OutlinedButton(
       onPressed: _titleController.text.isNotEmpty ? () {
         context.read<GoalList>().add(Goal(
-          endTime: context.read<SelectedTime>().get(),
+          endTime: context.read<SelectedTime>().get().toUtc(),
           description: _titleController.text,
         ));
         Navigator.pop(context);
@@ -111,7 +112,7 @@ class _DateTimeSetter extends StatelessWidget {
       children: [
         _DateSelector(_selectedTime),
         _TimeSelector(_selectedTime),
-        Text(_selectedTime.get().toString()),
+        Text(DateFormat.yMMMMEEEEd().add_jm().format(_selectedTime.get().toLocal())),
       ],
     );
   }

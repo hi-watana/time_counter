@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
@@ -40,7 +41,7 @@ class _CountdownElement extends StatelessWidget {
           child: Column(
             children: [
               ListTile(
-                title: Text(_endTime.toString()),
+                title: Text(DateFormat.yMMMMEEEEd().add_jm().format(_endTime.toLocal())),
                 subtitle: Text(
                   _description,
                   overflow: TextOverflow.ellipsis,

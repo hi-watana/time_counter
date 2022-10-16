@@ -49,21 +49,6 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      //body: Center(
-      //  child: Column(
-      //    mainAxisAlignment: MainAxisAlignment.start,
-      //    children: <Widget>[
-      //      MultiProvider(
-      //        providers: [
-      //          ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
-      //          ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController()),
-      //        ],
-      //        child: GoalSetter(),
-      //      ),
-      //      CountdownListView(),
-      //    ],
-      //  ),
-      //),
       body: CountdownListView(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
