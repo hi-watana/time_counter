@@ -49,19 +49,28 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: CountdownListView(),
+      body: const CountdownListView(),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           showModalBottomSheet(
             context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              )
+            ),
             builder: (context) {
               return MultiProvider(
                 providers: [
                   ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
                   ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController()),
                 ],
-                child: GoalSetter(),
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  child: const GoalSetter(),
+                ),
               );
             },
           );

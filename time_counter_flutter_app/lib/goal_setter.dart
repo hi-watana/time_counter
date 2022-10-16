@@ -13,17 +13,14 @@ class _TitleSetter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(left: 12, right: 12),
-      child: TextField(
-        enabled: true,
-        maxLength: maxTitleLength,
-        maxLines: 1,
-        textAlign: TextAlign.left,
-        controller: context.read<TextEditingController>(),
-        decoration: const InputDecoration(
-          hintText: 'title',
-        ),
+    return TextField(
+      enabled: true,
+      maxLength: maxTitleLength,
+      maxLines: 1,
+      textAlign: TextAlign.left,
+      controller: context.read<TextEditingController>(),
+      decoration: const InputDecoration(
+        hintText: 'title',
       ),
     );
   }
@@ -54,9 +51,7 @@ class _GoalSubmitter extends StatelessWidget {
 class _DateSelector extends StatelessWidget {
   static const Duration _lastDateDuration = Duration(days: 50000);
 
-  final SelectedTime _selectedTime;
-
-  const _DateSelector(this._selectedTime, {Key? key}) : super(key: key);
+  const _DateSelector({Key? key}) : super(key: key);
 
   Future<DateTime?> _pickDate(BuildContext context, DateTime _selectedTime) async {
     final now = DateTime.now();
@@ -65,22 +60,28 @@ class _DateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () async {
-        _selectedTime.setDate(await _pickDate(context, _selectedTime.get()));
-      },
-      child: const Text(
-        'Date',
-      ),
+    final _selectedTime = context.watch<SelectedTime>();
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          DateFormat.yMMMMEEEEd().format(_selectedTime.get()),
+        ),
+        IconButton(
+          alignment: Alignment.centerRight,
+          onPressed: () async {
+            _selectedTime.setDate(await _pickDate(context, _selectedTime.get()));
+          }, icon: const Icon(Icons.edit),
+        ),
+      ],
     );
   }
 
 }
 
 class _TimeSelector extends StatelessWidget {
-  final SelectedTime _selectedTime;
-
-  const _TimeSelector(this._selectedTime, {Key? key}) : super(key: key);
+  const _TimeSelector({Key? key}) : super(key: key);
 
   Future<TimeOfDay?> _pickTime(BuildContext context, DateTime _selectedTime) async {
     return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_selectedTime));
@@ -88,34 +89,24 @@ class _TimeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () async {
-        _selectedTime.setTime(await _pickTime(context, _selectedTime.get()));
-      },
-      child: const Text(
-        'Time',
-      ),
-    );
-  }
-
-}
-
-class _DateTimeSetter extends StatelessWidget {
-
-  const _DateTimeSetter({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
     final _selectedTime = context.watch<SelectedTime>();
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _DateSelector(_selectedTime),
-        _TimeSelector(_selectedTime),
-        Text(DateFormat.yMMMMEEEEd().add_jm().format(_selectedTime.get().toLocal())),
+        Text(
+          DateFormat.Hm().format(_selectedTime.get()),
+        ),
+        IconButton(
+          alignment: Alignment.centerRight,
+          onPressed: () async {
+            _selectedTime.setTime(await _pickTime(context, _selectedTime.get()));
+          }, icon: const Icon(Icons.edit),
+        ),
       ],
     );
   }
+
 }
 
 class GoalSetter extends StatelessWidget {
@@ -126,9 +117,13 @@ class GoalSetter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _DateTimeSetter(),
-        _TitleSetter(),
-        _GoalSubmitter(),
+        const _DateSelector(),
+        const _TimeSelector(),
+        const _TitleSetter(),
+        Container(
+          alignment: Alignment.centerRight,
+          child: const _GoalSubmitter(),
+        )
       ],
     );
   }
