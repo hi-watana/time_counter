@@ -8,7 +8,7 @@ import 'package:time_counter_flutter_library/time_counter.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
 import 'countdown_list_view.dart';
-import 'goal_setter.dart';
+import 'countdown_view.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -18,6 +18,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider<TimeCounter>(create: (_) => TimeCounter()),
         ChangeNotifierProvider<GoalList>(create: (_) => GoalList(GoalRepository(goalBox))),
+        ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
+        ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController()),
       ],
       child: const MyApp(),
     )
@@ -58,27 +60,9 @@ class MyHomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              )
-            ),
-            builder: (context) {
-              return MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
-                  ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController()),
-                ],
-                child: Container(
-                  margin: const EdgeInsets.all(20),
-                  child: const GoalSetter(),
-                ),
-              );
-            },
-          );
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) => const CountdownView(),
+          ));
         },
       ),
     );

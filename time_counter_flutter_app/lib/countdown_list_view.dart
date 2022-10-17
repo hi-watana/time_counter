@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
-import 'package:time_counter_flutter_library/time_counter.dart';
-import 'package:time_counter_library/time_counter_library.dart';
+
+import 'countdown_text.dart';
 
 class _CountdownElement extends StatelessWidget {
   final DateTime _endTime;
@@ -49,7 +49,7 @@ class _CountdownElement extends StatelessWidget {
                 padding: const EdgeInsets.only(
                   bottom: 10,
                 ),
-                child: _CountdownText(goal: _endTime),
+                child: CountdownText(goal: _endTime),
               )
             ],
           ),
@@ -74,29 +74,6 @@ class CountdownListView extends StatelessWidget {
           index: e.key,
         );
       }).toList(),
-    );
-  }
-}
-
-class _CountdownText extends StatelessWidget {
-  final DateTime _goal;
-
-  const _CountdownText({Key? key, required goal}) : _goal = goal, super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final TimeCounter _timeCounter = context.watch<TimeCounter>();
-    final _remainingTime = RemainingTime(goal: _goal, current: _timeCounter.getDateTime());
-    final _headline4 = Theme.of(context).textTheme.headline4;
-    if (_remainingTime.isTimeUp()) {
-      return Text(
-        _remainingTime.getStringFormat(),
-        style: _headline4?.copyWith(color: _headline4.color?.withAlpha(60)),
-      );
-    }
-    return Text(
-      _remainingTime.getStringFormat(),
-      style: _headline4,
     );
   }
 }
