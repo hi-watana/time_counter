@@ -6,9 +6,15 @@ class SelectedTime extends ChangeNotifier {
 
   late DateTime _selectedTime;
 
-  SelectedTime() {
-    final oneHourLater = DateTime.now().add(const Duration(hours: 1));
-    _selectedTime = DateTime(oneHourLater.year, oneHourLater.month, oneHourLater.day, oneHourLater.hour);
+  SelectedTime({
+    DateTime? initialTime,
+  }) {
+    if (initialTime == null) {
+      final oneHourLater = DateTime.now().add(const Duration(hours: 1));
+      _selectedTime = DateTime(oneHourLater.year, oneHourLater.month, oneHourLater.day, oneHourLater.hour);
+    } else {
+      _selectedTime = initialTime;
+    }
   }
 
   void setDate(DateTime? date) async {

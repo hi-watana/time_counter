@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
+import 'package:time_counter_library/time_counter_library.dart';
 
 import 'countdown_text.dart';
+import 'countdown_view.dart';
 
 class _CountdownElement extends StatelessWidget {
-  final DateTime _endTime;
-  final String _description;
+  final Goal _goal;
   final int _index;
 
   const _CountdownElement({
     Key? key,
-    required endTime,
-    required description,
+    required goal,
     required index,
-  }) : _endTime = endTime,
-        _description = description,
+  }) : _goal = goal,
         _index = index,
         super(key: key);
 
@@ -34,24 +33,36 @@ class _CountdownElement extends StatelessWidget {
             Icons.delete,
           ),
         ),
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              ListTile(
-                title: Text(DateFormat.yMMMMEEEEd().add_jm().format(_endTime.toLocal())),
-                subtitle: Text(
-                  _description,
-                  overflow: TextOverflow.ellipsis,
-                ),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => Provider.value(
+                value: (GoalList goalList, Goal goal) {
+                  goalList.update(_index, goal);
+                },
+                child: CountdownView(goal: _goal),
               ),
-              Container(
-                padding: const EdgeInsets.only(
-                  bottom: 10,
+            ));
+          },
+          child: Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(DateFormat.yMMMMEEEEd().add_jm().format(_goal.endTime.toLocal())),
+                  subtitle: Text(
+                    _goal.description,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                child: CountdownText(goal: _endTime),
-              )
-            ],
+                Container(
+                  padding: const EdgeInsets.only(
+                    bottom: 10,
+                  ),
+                  child: CountdownText(goal: _goal.endTime),
+                )
+              ],
+            ),
           ),
         ),
       onDismissed: (direction) {
@@ -69,8 +80,7 @@ class CountdownListView extends StatelessWidget {
     return ListView(
       children: context.watch<GoalList>().get().asMap().entries.map((e) {
         return _CountdownElement(
-          endTime: e.value.endTime,
-          description: e.value.description,
+          goal: e.value,
           index: e.key,
         );
       }).toList(),

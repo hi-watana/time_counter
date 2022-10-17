@@ -5,11 +5,11 @@ import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/selected_time.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
-class _TitleSetter extends StatelessWidget {
+class _DescriptionSetter extends StatelessWidget {
 
   static const int maxTitleLength = 60;
 
-  const _TitleSetter({Key? key}) : super(key: key);
+  const _DescriptionSetter({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class _TitleSetter extends StatelessWidget {
       textAlign: TextAlign.left,
       controller: context.read<TextEditingController>(),
       decoration: const InputDecoration(
-        hintText: 'title',
+        hintText: 'description',
       ),
     );
   }
@@ -32,17 +32,19 @@ class _GoalSubmitter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _titleController = context.watch<TextEditingController>();
+    final _onSubmit = context.read<Null Function(GoalList, Goal)>();
+    final _goalList = context.read<GoalList>();
 
     return OutlinedButton(
       onPressed: _titleController.text.isNotEmpty ? () {
-        context.read<GoalList>().add(Goal(
+        _onSubmit(_goalList, Goal(
           endTime: context.read<SelectedTime>().get().toUtc(),
           description: _titleController.text,
         ));
         Navigator.pop(context);
       } : null,
       child: const Text(
-        'Add',
+        'Save',
       ),
     );
   }
@@ -109,9 +111,9 @@ class _TimeSelector extends StatelessWidget {
 
 }
 
-class GoalSetter extends StatelessWidget {
+class GoalEditor extends StatelessWidget {
 
-  const GoalSetter({Key? key}) : super(key: key);
+  const GoalEditor({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +121,7 @@ class GoalSetter extends StatelessWidget {
       children: [
         const _DateSelector(),
         const _TimeSelector(),
-        const _TitleSetter(),
+        const _DescriptionSetter(),
         Container(
           alignment: Alignment.centerRight,
           child: const _GoalSubmitter(),
