@@ -1,36 +1,46 @@
 class RemainingTime {
-  late final int _remainingSecond;
+  late final DateTime _goal;
+  late final DateTime _current;
 
   RemainingTime({required goal, required current}) {
-    _remainingSecond = _remainingMicroSecond(goal, current);
+    final localGoal = goal.toUtc();
+    final localCurrent = current.toUtc();
+    _goal = DateTime(localGoal.year, localGoal.month, localGoal.day, localGoal.hour, localGoal.minute, localGoal.second);
+    _current = DateTime(localCurrent.year, localCurrent.month, localCurrent.day, localCurrent.hour, localCurrent.minute, localCurrent.second);
   }
 
-  bool isTimeUp() => _remainingSecond <= 0;
+  bool isTimeUp() => _goal.isBefore(_current);
 
-  int _remainingMicroSecond(DateTime goal, DateTime current) {
-    return goal.microsecondsSinceEpoch - current.microsecondsSinceEpoch;
-  }
-
-  int _microSecondToSecond(int microSecond) => microSecond ~/ 1000000;
-
-  String _formatDifference(int differenceBySecond) {
-    var minutes = differenceBySecond ~/ 60;
-    differenceBySecond %= 60;
-    var hours = minutes ~/ 60;
-    minutes %= 60;
-    var days = hours ~/ 24;
-    hours %= 24;
-    var weeks = days ~/ 7;
-    days %= 7;
-    var years = weeks ~/ 52;
-    weeks %= 52;
-    return '${years.toString().padLeft(4, '0')}-${weeks.toString().padLeft(2, '0')}-${days.toString().padLeft(1, '0')}-${hours.toString().padLeft(2, '0')}-${minutes.toString().padLeft(2, '0')}-${differenceBySecond.toString().padLeft(2, '0')}';
+  String _formatDifference(DateTime before, DateTime after) {
+    final diff = after.difference(before);
+    final ds = diff.inSeconds % 60;
+    final dm = diff.inMinutes % 60;
+    final dh = diff.inHours % 24;
+    var day = before.add(Duration(seconds: diff.inSeconds % 86400));
+    var dd = 0;
+    if (after.day < day.day) {
+      dd = 31 - day.day + 1;
+      dd = after.day - day.add(Duration(days: dd)).day + dd;
+    } else {
+      dd = after.day - day.day;
+    }
+    day = day.add(Duration(days: dd));
+    late final dM;
+    late final dy;
+    if (after.month < day.month) {
+      dM = DateTime.monthsPerYear + after.month - day.month;
+      dy = after.year - day.year - 1;
+    } else {
+      dM = after.month - day.month;
+      dy = after.year - day.year;
+    }
+    return '${dy.toString().padLeft(4, '0')}-${dM.toString().padLeft(2, '0')}-${dd.toString().padLeft(2, '0')}-${dh.toString().padLeft(2, '0')}-${dm.toString().padLeft(2, '0')}-${ds.toString().padLeft(2, '0')}';
   }
 
   String getStringFormat() {
-    if (_remainingSecond < 0) {
-      return '- ${_formatDifference(-_microSecondToSecond(_remainingSecond) + 1)}';
+    if (isTimeUp()) {
+      return '- ${_formatDifference(_goal, _current)}';
     }
-    return '+ ${_formatDifference(_microSecondToSecond(_remainingSecond))}';
+    return '+ ${_formatDifference(_current, _goal)}';
   }
 }
