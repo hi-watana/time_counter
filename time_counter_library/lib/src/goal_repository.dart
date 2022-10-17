@@ -20,5 +20,7 @@ class GoalRepository {
 
   void update(int i, Goal goal) => _goalBox.putAt(i, goal);
 
+  int size() => _goalBox.length;
+
   List<Goal> get() => List.unmodifiable(_goalBox.values);
 }

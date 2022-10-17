@@ -20,7 +20,7 @@ class _DescriptionSetter extends StatelessWidget {
       textAlign: TextAlign.left,
       controller: context.read<TextEditingController>(),
       decoration: const InputDecoration(
-        hintText: 'description',
+        labelText: 'description',
       ),
     );
   }

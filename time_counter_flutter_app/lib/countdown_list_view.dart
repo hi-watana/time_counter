@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:time_counter/hero_tags.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
@@ -22,28 +23,31 @@ class _CountdownElement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-        key: UniqueKey(),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: AlignmentDirectional.centerEnd,
-          padding: const EdgeInsets.only(
-            right: 20,
-          ),
-          child: const Icon(
-            Icons.delete,
-          ),
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: AlignmentDirectional.centerEnd,
+        padding: const EdgeInsets.only(
+          right: 20,
         ),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) => Provider.value(
-                value: (GoalList goalList, Goal goal) {
+        child: const Icon(
+          Icons.delete,
+        ),
+      ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CountdownView(
+                goal: _goal,
+                tag: '$updateTagPrefix$_index',
+                updateGoalList: (GoalList goalList, Goal goal) {
                   goalList.update(_index, goal);
                 },
-                child: CountdownView(goal: _goal),
-              ),
-            ));
-          },
+              )),
+          );
+        },
+        child: Hero(
+          tag: '$updateTagPrefix$_index',
           child: Card(
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -65,6 +69,7 @@ class _CountdownElement extends StatelessWidget {
             ),
           ),
         ),
+      ),
       onDismissed: (direction) {
         context.read<GoalList>().removeAt(_index);
       },
@@ -77,13 +82,20 @@ class CountdownListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _goalList = context.watch<GoalList>();
     return ListView(
-      children: context.watch<GoalList>().get().asMap().entries.map((e) {
-        return _CountdownElement(
-          goal: e.value,
-          index: e.key,
-        );
-      }).toList(),
+      children: [
+        ..._goalList.get().asMap().entries.map((e) {
+          return _CountdownElement(
+            goal: e.value,
+            index: e.key,
+          );
+        }),
+         Hero(
+          tag: '$updateTagPrefix${_goalList.size()}',
+          child: const Card(),
+        )
+      ],
     );
   }
 }

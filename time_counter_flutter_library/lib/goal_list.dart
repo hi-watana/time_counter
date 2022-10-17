@@ -24,5 +24,7 @@ class GoalList extends ChangeNotifier {
     notifyListeners();
   }
 
+  int size() => _goalRepository.size();
+
   List<Goal> get() => _goalRepository.get();
 }
