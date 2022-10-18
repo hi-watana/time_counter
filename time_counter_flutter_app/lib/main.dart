@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter/countdown_view.dart';
@@ -13,6 +14,12 @@ import 'countdown_list_view.dart';
 void main() async {
   await Hive.initFlutter();
   final goalBox = await openGoalBox();
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(
+    [
+      DeviceOrientation.portraitUp
+    ],
+  );
   runApp(
     MultiProvider(
       providers: [
