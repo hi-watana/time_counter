@@ -67,7 +67,10 @@ class _CountdownElement extends StatelessWidget {
       children: <Widget>[
         const GoalEditor(),
         const Padding(padding: EdgeInsets.all(10)),
-        CountdownText(goal: _selectedTime.get()),
+        Container(
+          alignment: AlignmentDirectional.centerEnd,
+          child: CountdownText(goal: _selectedTime.get()),
+        ),
       ],
     );
   }

@@ -25,8 +25,8 @@ class RemainingTime {
       dd = after.day - day.day;
     }
     day = day.add(Duration(days: dd));
-    late final dM;
-    late final dy;
+    late final int dM;
+    late final int dy;
     if (after.month < day.month) {
       dM = DateTime.monthsPerYear + after.month - day.month;
       dy = after.year - day.year - 1;
@@ -34,7 +34,7 @@ class RemainingTime {
       dM = after.month - day.month;
       dy = after.year - day.year;
     }
-    return '${dy.toString().padLeft(4, '0')}-${dM.toString().padLeft(2, '0')}-${dd.toString().padLeft(2, '0')}-${dh.toString().padLeft(2, '0')}-${dm.toString().padLeft(2, '0')}-${ds.toString().padLeft(2, '0')}';
+    return '${dy.toString().padLeft(4, '0')}y ${dM.toString().padLeft(2, '0')}M ${dd.toString().padLeft(2, '0')}d ${dh.toString().padLeft(2, '0')}:${dm.toString().padLeft(2, '0')}:${ds.toString().padLeft(2, '0')}';
   }
 
   String getStringFormat() {

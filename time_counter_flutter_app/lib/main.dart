@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter/countdown_view.dart';
-import 'package:time_counter/hero_tags.dart';
+import 'package:time_counter/constants.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
 import 'package:time_counter_library/time_counter_library.dart';
@@ -32,11 +32,11 @@ class MyApp extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         return MaterialApp(
-          title: 'Countdown',
+          title: appTitle,
           theme: _lightTheme(lightDynamic),
           darkTheme: _darkTheme(darkDynamic),
           themeMode: ThemeMode.system,
-          home: const MyHomePage(title: 'Countdown'),
+          home: const MyHomePage(title: appTitle),
         );
       }
     );

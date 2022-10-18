@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:time_counter/hero_tags.dart';
+import 'package:time_counter/constants.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
@@ -60,8 +60,10 @@ class _CountdownElement extends StatelessWidget {
                   ),
                 ),
                 Container(
+                  alignment: AlignmentDirectional.centerEnd,
                   padding: const EdgeInsets.only(
                     bottom: 10,
+                    right: 20,
                   ),
                   child: CountdownText(goal: _goal.endTime),
                 )
