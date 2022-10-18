@@ -51,13 +51,21 @@ class _GoalSubmitter extends StatelessWidget {
 }
 
 class _DateSelector extends StatelessWidget {
-  static const Duration _lastDateDuration = Duration(days: 50000);
+  static const Duration _latestDateDuration = Duration(days: 50000);
+  static const Duration _earliestDateDuration = Duration(days: 50000);
 
   const _DateSelector({Key? key}) : super(key: key);
 
   Future<DateTime?> _pickDate(BuildContext context, DateTime _selectedTime) async {
     final now = DateTime.now();
-    return await showDatePicker(context: context, initialDate: _selectedTime, firstDate: now, lastDate: now.add(_lastDateDuration));
+    return await showDatePicker(
+        context: context,
+        initialDate:
+        _selectedTime,
+        firstDate:
+        now.subtract(_earliestDateDuration),
+        lastDate: now.add(_latestDateDuration),
+    );
   }
 
   @override
