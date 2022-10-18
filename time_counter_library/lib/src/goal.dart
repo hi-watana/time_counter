@@ -7,10 +7,10 @@ class Goal {
   final DateTime endTime;
 
   @HiveField(1)
-  final String title;
+  final String description;
 
   Goal({
     required this.endTime,
-    required this.title,
+    required this.description,
   });
 }

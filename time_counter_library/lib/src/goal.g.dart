@@ -18,7 +18,7 @@ class GoalAdapter extends TypeAdapter<Goal> {
     };
     return Goal(
       endTime: fields[0] as DateTime,
-      title: fields[1] as String,
+      description: fields[1] as String,
     );
   }
 
@@ -29,7 +29,7 @@ class GoalAdapter extends TypeAdapter<Goal> {
       ..writeByte(0)
       ..write(obj.endTime)
       ..writeByte(1)
-      ..write(obj.title);
+      ..write(obj.description);
   }
 
   @override
