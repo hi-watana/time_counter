@@ -68,7 +68,8 @@ class _DateSelector extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          DateFormat.yMMMMEEEEd().format(_selectedTime.get()),
+          DateFormat.yMMMEd().format(_selectedTime.get()),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         IconButton(
           alignment: Alignment.centerRight,
@@ -83,6 +84,8 @@ class _DateSelector extends StatelessWidget {
 }
 
 class _TimeSelector extends StatelessWidget {
+  static final _timeFormat = DateFormat('hh:mm a');
+
   const _TimeSelector({Key? key}) : super(key: key);
 
   Future<TimeOfDay?> _pickTime(BuildContext context, DateTime _selectedTime) async {
@@ -97,7 +100,8 @@ class _TimeSelector extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          DateFormat.Hm().format(_selectedTime.get()),
+          _timeFormat.format(_selectedTime.get()),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         IconButton(
           alignment: Alignment.centerRight,

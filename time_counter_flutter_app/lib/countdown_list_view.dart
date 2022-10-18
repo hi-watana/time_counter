@@ -53,7 +53,7 @@ class _CountdownElement extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
-                  title: Text(DateFormat.yMMMMEEEEd().add_jm().format(_goal.endTime.toLocal())),
+                  title: Text(DateFormat.yMMMEd().add_jm().format(_goal.endTime.toLocal())),
                   subtitle: Text(
                     _goal.description,
                     overflow: TextOverflow.ellipsis,
