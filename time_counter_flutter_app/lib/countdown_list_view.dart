@@ -86,18 +86,12 @@ class CountdownListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final _goalList = context.watch<GoalList>();
     return ListView(
-      children: [
-        ..._goalList.get().asMap().entries.map((e) {
-          return _CountdownElement(
-            goal: e.value,
-            index: e.key,
-          );
-        }),
-         Hero(
-          tag: '$updateTagPrefix${_goalList.size()}',
-          child: const Card(),
-        )
-      ],
+      children: _goalList.get().asMap().entries.map((e) {
+        return _CountdownElement(
+          goal: e.value,
+          index: e.key,
+        );
+      }).toList(),
     );
   }
 }

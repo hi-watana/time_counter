@@ -50,17 +50,32 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _goalListSize = context.watch<GoalList>().size();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
-      body: const CountdownListView(),
+      body: Column(
+        children: [
+          const Expanded(
+            child: CountdownListView(),
+          ),
+          Hero(
+            tag: '$updateTagPrefix$_goalListSize',
+            child: const SizedBox(
+              width: double.infinity,
+              child: Card(),
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(
             builder: (_) => CountdownView(
-              tag: '$updateTagPrefix${context.watch<GoalList>().size()}',
+              tag: '$updateTagPrefix$_goalListSize',
               updateGoalList: (GoalList goalList, Goal goal) {
                 goalList.add(goal);
               },
