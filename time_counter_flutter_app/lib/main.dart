@@ -11,9 +11,6 @@ import 'package:time_counter_library/time_counter_library.dart';
 
 import 'countdown_list_view.dart';
 
-import 'banner_ad.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 void main() async {
   await Hive.initFlutter();
   final goalBox = await openGoalBox();
@@ -23,10 +20,6 @@ void main() async {
       DeviceOrientation.portraitUp
     ],
   );
-
-  WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
-
   runApp(
     MultiProvider(
       providers: [
@@ -82,27 +75,20 @@ class MyHomePage extends StatelessWidget {
               child: Card(),
             ),
           ),
-          Container(
-            height: 50,
-            child: MyBanner(),
-          ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 50.0),
-        child: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (_) => CountdownView(
-                tag: '$updateTagPrefix$_goalListSize',
-                updateGoalList: (GoalList goalList, Goal goal) {
-                  goalList.add(goal);
-                },
-              ),
-            ));
-          },
-        ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => CountdownView(
+              tag: '$updateTagPrefix$_goalListSize',
+              updateGoalList: (GoalList goalList, Goal goal) {
+                goalList.add(goal);
+              },
+            ),
+          ));
+        },
       ),
     );
   }

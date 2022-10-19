@@ -42,7 +42,6 @@ dependencies:
   hive_flutter: ^1.1.0
   intl: ^0.17.0
   dynamic_color: ^1.5.4
-  google_mobile_ads: ^2.1.0
 
 dev_dependencies:
   flutter_test:
