@@ -51,13 +51,21 @@ class _GoalSubmitter extends StatelessWidget {
 }
 
 class _DateSelector extends StatelessWidget {
-  static const Duration _lastDateDuration = Duration(days: 50000);
+  static const Duration _latestDateDuration = Duration(days: 50000);
+  static const Duration _earliestDateDuration = Duration(days: 50000);
 
   const _DateSelector({Key? key}) : super(key: key);
 
   Future<DateTime?> _pickDate(BuildContext context, DateTime _selectedTime) async {
     final now = DateTime.now();
-    return await showDatePicker(context: context, initialDate: _selectedTime, firstDate: now, lastDate: now.add(_lastDateDuration));
+    return await showDatePicker(
+        context: context,
+        initialDate:
+        _selectedTime,
+        firstDate:
+        now.subtract(_earliestDateDuration),
+        lastDate: now.add(_latestDateDuration),
+    );
   }
 
   @override
@@ -68,7 +76,8 @@ class _DateSelector extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          DateFormat.yMMMMEEEEd().format(_selectedTime.get()),
+          DateFormat.yMMMEd().format(_selectedTime.get()),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         IconButton(
           alignment: Alignment.centerRight,
@@ -83,6 +92,8 @@ class _DateSelector extends StatelessWidget {
 }
 
 class _TimeSelector extends StatelessWidget {
+  static final _timeFormat = DateFormat('hh:mm a');
+
   const _TimeSelector({Key? key}) : super(key: key);
 
   Future<TimeOfDay?> _pickTime(BuildContext context, DateTime _selectedTime) async {
@@ -97,7 +108,8 @@ class _TimeSelector extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          DateFormat.Hm().format(_selectedTime.get()),
+          _timeFormat.format(_selectedTime.get()),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         IconButton(
           alignment: Alignment.centerRight,

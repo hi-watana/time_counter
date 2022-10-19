@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:time_counter/hero_tags.dart';
+import 'package:time_counter/constants.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
@@ -53,15 +53,17 @@ class _CountdownElement extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
-                  title: Text(DateFormat.yMMMMEEEEd().add_jm().format(_goal.endTime.toLocal())),
+                  title: Text(DateFormat.yMMMEd().add_jm().format(_goal.endTime.toLocal())),
                   subtitle: Text(
                     _goal.description,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
+                  alignment: AlignmentDirectional.centerEnd,
                   padding: const EdgeInsets.only(
                     bottom: 10,
+                    right: 20,
                   ),
                   child: CountdownText(goal: _goal.endTime),
                 )
@@ -84,18 +86,12 @@ class CountdownListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final _goalList = context.watch<GoalList>();
     return ListView(
-      children: [
-        ..._goalList.get().asMap().entries.map((e) {
-          return _CountdownElement(
-            goal: e.value,
-            index: e.key,
-          );
-        }),
-         Hero(
-          tag: '$updateTagPrefix${_goalList.size()}',
-          child: const Card(),
-        )
-      ],
+      children: _goalList.get().asMap().entries.map((e) {
+        return _CountdownElement(
+          goal: e.value,
+          index: e.key,
+        );
+      }).toList(),
     );
   }
 }

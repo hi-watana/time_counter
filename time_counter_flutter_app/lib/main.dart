@@ -1,9 +1,10 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter/countdown_view.dart';
-import 'package:time_counter/hero_tags.dart';
+import 'package:time_counter/constants.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
 import 'package:time_counter_library/time_counter_library.dart';
@@ -13,6 +14,12 @@ import 'countdown_list_view.dart';
 void main() async {
   await Hive.initFlutter();
   final goalBox = await openGoalBox();
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(
+    [
+      DeviceOrientation.portraitUp
+    ],
+  );
   runApp(
     MultiProvider(
       providers: [
@@ -32,11 +39,11 @@ class MyApp extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         return MaterialApp(
-          title: 'Countdown',
+          title: appTitle,
           theme: _lightTheme(lightDynamic),
           darkTheme: _darkTheme(darkDynamic),
           themeMode: ThemeMode.system,
-          home: const MyHomePage(title: 'Countdown'),
+          home: const MyHomePage(title: appTitle),
         );
       }
     );
@@ -50,17 +57,32 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _goalListSize = context.watch<GoalList>().size();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
-      body: const CountdownListView(),
+      body: Column(
+        children: [
+          const Expanded(
+            child: CountdownListView(),
+          ),
+          Hero(
+            tag: '$updateTagPrefix$_goalListSize',
+            child: const SizedBox(
+              width: double.infinity,
+              child: Card(),
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(
             builder: (_) => CountdownView(
-              tag: '$updateTagPrefix${context.watch<GoalList>().size()}',
+              tag: '$updateTagPrefix$_goalListSize',
               updateGoalList: (GoalList goalList, Goal goal) {
                 goalList.add(goal);
               },
