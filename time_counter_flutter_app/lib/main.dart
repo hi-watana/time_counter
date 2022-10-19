@@ -2,13 +2,13 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:time_counter/countdown_view.dart';
+import 'package:time_counter/hero_tags.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
-import 'package:time_counter_flutter_library/selected_time.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
 import 'countdown_list_view.dart';
-import 'goal_setter.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -19,7 +19,7 @@ void main() async {
         ChangeNotifierProvider<TimeCounter>(create: (_) => TimeCounter()),
         ChangeNotifierProvider<GoalList>(create: (_) => GoalList(GoalRepository(goalBox))),
       ],
-      child: const MyApp(),
+      builder: (context, child) => const MyApp(),
     )
   );
 }
@@ -58,27 +58,14 @@ class MyHomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              )
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => CountdownView(
+              tag: '$updateTagPrefix${context.watch<GoalList>().size()}',
+              updateGoalList: (GoalList goalList, Goal goal) {
+                goalList.add(goal);
+              },
             ),
-            builder: (context) {
-              return MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime()),
-                  ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController()),
-                ],
-                child: Container(
-                  margin: const EdgeInsets.all(20),
-                  child: const GoalSetter(),
-                ),
-              );
-            },
-          );
+          ));
         },
       ),
     );

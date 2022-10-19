@@ -19,5 +19,12 @@ class GoalList extends ChangeNotifier {
     notifyListeners();
   }
 
+  void update(int i, Goal goal) {
+    _goalRepository.update(i, goal);
+    notifyListeners();
+  }
+
+  int size() => _goalRepository.size();
+
   List<Goal> get() => _goalRepository.get();
 }
