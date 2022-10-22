@@ -49,16 +49,20 @@ class RemainingTime {
     return RemainingTime._(dy, dM, dd, dh, dm, ds, isTimeUp);
   }
 
-  String getStringFormat() {
+  @override
+  String toString() {
+    bool nonZero = false;
     StringBuffer sb = StringBuffer();
     sb.write(isTimeUp ? '- ' : '+ ');
     if (years > 0) {
       sb.write('${years}y ');
+      nonZero = true;
     }
-    if (months > 0) {
+    if (nonZero || months > 0) {
       sb.write('${months.toString().padLeft(2, '0')}M ');
+      nonZero = true;
     }
-    if (days > 0) {
+    if (nonZero || days > 0) {
       sb.write('${days.toString().padLeft(2, '0')}d ');
     }
     sb.write('${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}');
