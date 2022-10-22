@@ -10,8 +10,8 @@ class RemainingTime {
   const RemainingTime._(this.years, this.months, this.days, this.hours, this.minutes, this.seconds, this.isTimeUp);
 
   static RemainingTime of({required DateTime goal, required DateTime current}) {
-    final localGoal = goal.toUtc();
-    final localCurrent = current.toUtc();
+    final localGoal = goal;
+    final localCurrent = current;
     final goalTime = DateTime(localGoal.year, localGoal.month, localGoal.day, localGoal.hour, localGoal.minute, localGoal.second);
     final currentTime = DateTime(localCurrent.year, localCurrent.month, localCurrent.day, localCurrent.hour, localCurrent.minute, localCurrent.second);
     final isTimeUp = goalTime.isBefore(currentTime);
@@ -32,10 +32,10 @@ class RemainingTime {
     if (after.day < day.day) {
       dd = 31 - day.day + 1;
       dd = after.day - day.add(Duration(days: dd)).day + dd;
+      day = day.add(Duration(days: dd));
     } else {
       dd = after.day - day.day;
     }
-    day = day.add(Duration(days: dd));
     late final int dM;
     late final int dy;
     if (after.month < day.month) {
