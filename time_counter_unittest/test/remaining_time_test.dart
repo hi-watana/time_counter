@@ -109,8 +109,9 @@ void main() {
     group('toString should return string format correctly', () {
       final base01Jan = DateTime(2001);
       final base01Feb = DateTime(2001, 2);
-      final base02Jan = DateTime(2002, 2);
+      final base02Jan = DateTime(2002);
       final base02Feb = DateTime(2002, 2);
+      final base20Jan = DateTime(2020);
       // label, goal, current, expected
       final testCases = [
         Tuple4('01', base01Jan, base01Jan, '+ 00:00:00'),
@@ -125,26 +126,28 @@ void main() {
         Tuple4('10', base01Jan.add(Duration(days: 1)), base01Jan, '+ 01d 00:00:00'),
         Tuple4('11', base01Feb, base01Jan, '+ 01M 00d 00:00:00'),
         Tuple4('12', base01Feb.add(Duration(days: 20)), base01Jan, '+ 01M 20d 00:00:00'),
-        Tuple4('13', base02Jan, base01Jan, '+ 01y 00M 00d 00:00:00'),
-        Tuple4('14', base02Jan.add(Duration(days: 1)), base01Jan, '+ 01d 00M 01d 00:00:00'),
+        Tuple4('13', base02Jan, base01Jan, '+ 1y 00M 00d 00:00:00'),
+        Tuple4('14', base02Jan.add(Duration(days: 1)), base01Jan, '+ 1y 00M 01d 00:00:00'),
         Tuple4('15', base02Feb, base01Jan, '+ 1y 01M 00d 00:00:00'),
         Tuple4('16', base02Feb.add(Duration(days: 20)), base01Jan, '+ 1y 01M 20d 00:00:00'),
+        Tuple4('17', base20Jan, base01Jan, '+ 19y 00M 00d 00:00:00'),
 
-        Tuple4('17', base01Jan, base01Jan.add(Duration(seconds: 3)), '- 00:00:03'),
-        Tuple4('18', base01Jan, base01Jan.add(Duration(seconds: 10)), '- 00:00:10'),
-        Tuple4('19', base01Jan, base01Jan.add(Duration(minutes: 1)), '- 00:01:00'),
-        Tuple4('20', base01Jan, base01Jan.add(Duration(minutes: 12, seconds: 3)), '- 00:12:03'),
-        Tuple4('21', base01Jan, base01Jan.add(Duration(hours: 2)), '- 02:00:00'),
-        Tuple4('22', base01Jan, base01Jan.add(Duration(hours: 2, seconds: 30)), '- 02:00:30'),
-        Tuple4('23', base01Jan, base01Jan.add(Duration(hours: 20, minutes: 25)), '- 20:25:00'),
-        Tuple4('24', base01Jan, base01Jan.add(Duration(hours: 20, minutes: 2, seconds: 3)), '- 20:02:03'),
-        Tuple4('25', base01Jan, base01Jan.add(Duration(days: 1)), '- 01d 00:00:00'),
-        Tuple4('26', base01Feb, base01Jan, '- 01M 00d 00:00:00'),
-        Tuple4('27', base01Jan, base01Feb.add(Duration(days: 20)), '- 01M 20d 00:00:00'),
-        Tuple4('28', base01Jan, base02Jan, '- 01y 00M 00d 00:00:00'),
-        Tuple4('29', base01Jan, base02Jan.add(Duration(days: 1)), '- 01d 00M 01d 00:00:00'),
-        Tuple4('30', base01Jan, base02Feb, '- 1y 01M 00d 00:00:00'),
-        Tuple4('31', base01Jan, base02Feb.add(Duration(days: 20)), '- 1y 01M 20d 00:00:00'),
+        Tuple4('18', base01Jan, base01Jan.add(Duration(seconds: 3)), '- 00:00:03'),
+        Tuple4('19', base01Jan, base01Jan.add(Duration(seconds: 10)), '- 00:00:10'),
+        Tuple4('20', base01Jan, base01Jan.add(Duration(minutes: 1)), '- 00:01:00'),
+        Tuple4('21', base01Jan, base01Jan.add(Duration(minutes: 12, seconds: 3)), '- 00:12:03'),
+        Tuple4('22', base01Jan, base01Jan.add(Duration(hours: 2)), '- 02:00:00'),
+        Tuple4('23', base01Jan, base01Jan.add(Duration(hours: 2, seconds: 30)), '- 02:00:30'),
+        Tuple4('24', base01Jan, base01Jan.add(Duration(hours: 20, minutes: 25)), '- 20:25:00'),
+        Tuple4('25', base01Jan, base01Jan.add(Duration(hours: 20, minutes: 2, seconds: 3)), '- 20:02:03'),
+        Tuple4('26', base01Jan, base01Jan.add(Duration(days: 1)), '- 01d 00:00:00'),
+        Tuple4('27', base01Jan, base01Feb, '- 01M 00d 00:00:00'),
+        Tuple4('28', base01Jan, base01Feb.add(Duration(days: 20)), '- 01M 20d 00:00:00'),
+        Tuple4('29', base01Jan, base02Jan, '- 1y 00M 00d 00:00:00'),
+        Tuple4('30', base01Jan, base02Jan.add(Duration(days: 1)), '- 1y 00M 01d 00:00:00'),
+        Tuple4('31', base01Jan, base02Feb, '- 1y 01M 00d 00:00:00'),
+        Tuple4('32', base01Jan, base02Feb.add(Duration(days: 20)), '- 1y 01M 20d 00:00:00'),
+        Tuple4('33', base01Jan, base20Jan, '- 19y 00M 00d 00:00:00'),
       ];
 
       for (var testCase in testCases) {
