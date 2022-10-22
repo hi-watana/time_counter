@@ -10,8 +10,8 @@ class RemainingTime {
   const RemainingTime._(this.years, this.months, this.days, this.hours, this.minutes, this.seconds, this.isTimeUp);
 
   static RemainingTime of({required DateTime goal, required DateTime current}) {
-    final localGoal = goal;
-    final localCurrent = current;
+    final localGoal = goal.toLocal();
+    final localCurrent = current.toLocal();
     final goalTime = DateTime(localGoal.year, localGoal.month, localGoal.day, localGoal.hour, localGoal.minute, localGoal.second);
     final currentTime = DateTime(localCurrent.year, localCurrent.month, localCurrent.day, localCurrent.hour, localCurrent.minute, localCurrent.second);
     final isTimeUp = goalTime.isBefore(currentTime);
