@@ -84,9 +84,9 @@ class CountdownListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _goalList = context.watch<GoalList>();
+    final goalList = context.watch<GoalList>();
     return ListView(
-      children: _goalList.get().asMap().entries.map((e) {
+      children: goalList.get().asMap().entries.map((e) {
         return _CountdownElement(
           goal: e.value,
           index: e.key,

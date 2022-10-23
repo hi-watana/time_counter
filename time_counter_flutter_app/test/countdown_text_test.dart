@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:time_counter/countdown_text.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
 
-import 'goal_setter_test.mocks.dart';
+import 'countdown_text_test.mocks.dart';
 
 Future<void> _pumpWidget(WidgetTester tester, TimeCounter mockTimeCounter) async {
   await tester.pumpWidget(

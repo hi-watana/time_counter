@@ -62,14 +62,14 @@ class _CountdownElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedTime = context.watch<SelectedTime>();
+    final selectedTime = context.watch<SelectedTime>();
     return Column(
       children: <Widget>[
         const GoalEditor(),
         const Padding(padding: EdgeInsets.all(10)),
         Container(
           alignment: AlignmentDirectional.centerEnd,
-          child: CountdownText(goal: _selectedTime.get()),
+          child: CountdownText(goal: selectedTime.get()),
         ),
       ],
     );
