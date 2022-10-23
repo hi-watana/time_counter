@@ -16,12 +16,12 @@ class CountdownText extends StatelessWidget {
     final _headline4 = Theme.of(context).textTheme.headline4;
     if (_remainingTime.isTimeUp) {
       return Text(
-        _remainingTime.getStringFormat(),
+        _remainingTime.toString(),
         style: _headline4?.copyWith(color: _headline4.color?.withAlpha(60)),
       );
     }
     return Text(
-      _remainingTime.getStringFormat(),
+      _remainingTime.toString(),
       style: _headline4,
     );
   }
