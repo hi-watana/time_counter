@@ -32,13 +32,13 @@ class _GoalSubmitter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleController = context.watch<TextEditingController>();
-    final onSubmit = context.read<Null Function(GoalList, Goal)>();
+    final onSubmit = context.read<Null Function(GoalList, GoalView)>();
     final goalList = context.read<GoalList>();
 
     return OutlinedButton(
       onPressed: titleController.text.isNotEmpty ? () {
-        onSubmit(goalList, Goal(
-          endTime: context.read<SelectedTime>().get().toUtc(),
+        onSubmit(goalList, GoalView(
+          endTime: context.read<SelectedTime>().get(),
           description: titleController.text,
         ));
         Navigator.pop(context);

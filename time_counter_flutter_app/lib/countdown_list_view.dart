@@ -9,7 +9,7 @@ import 'countdown_text.dart';
 import 'countdown_view.dart';
 
 class _CountdownElement extends StatelessWidget {
-  final Goal _goal;
+  final GoalView _goal;
   final int _index;
 
   const _CountdownElement({
@@ -40,7 +40,7 @@ class _CountdownElement extends StatelessWidget {
               builder: (_) => CountdownView(
                 goal: _goal,
                 tag: '$updateTagPrefix$_index',
-                updateGoalList: (GoalList goalList, Goal goal) {
+                updateGoalList: (GoalList goalList, GoalView goal) {
                   goalList.update(_index, goal);
                 },
               )),
@@ -53,7 +53,7 @@ class _CountdownElement extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
-                  title: Text(DateFormat.yMMMEd().add_jm().format(_goal.endTime.toLocal())),
+                  title: Text(DateFormat.yMMMEd().add_jm().format(_goal.endTime)),
                   subtitle: Text(
                     _goal.description,
                     overflow: TextOverflow.ellipsis,

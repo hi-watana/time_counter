@@ -83,7 +83,7 @@ class MyHomePage extends StatelessWidget {
           Navigator.push(context, MaterialPageRoute(
             builder: (_) => CountdownView(
               tag: '$updateTagPrefix$goalListSize',
-              updateGoalList: (GoalList goalList, Goal goal) {
+              updateGoalList: (GoalList goalList, GoalView goal) {
                 goalList.add(goal);
               },
             ),

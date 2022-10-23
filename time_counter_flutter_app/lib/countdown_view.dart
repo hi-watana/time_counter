@@ -8,9 +8,9 @@ import 'package:time_counter_library/time_counter_library.dart';
 import 'countdown_text.dart';
 
 class CountdownView extends StatelessWidget {
-  final Goal? goal;
+  final GoalView? goal;
   final String _heroTag;
-  final Null Function(GoalList, Goal) _updateGoalList;
+  final Null Function(GoalList, GoalView) _updateGoalList;
 
   const CountdownView({
     Key? key,
@@ -38,7 +38,7 @@ class CountdownView extends StatelessWidget {
         child: Card(
           child: MultiProvider(
             providers: [
-              ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime(initialTime: goal?.endTime.toLocal())),
+              ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime(initialTime: goal?.endTime)),
               ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController(text: goal?.description)),
               Provider.value(value: _updateGoalList),
             ],
