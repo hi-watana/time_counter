@@ -6,7 +6,7 @@ part of 'goal_entity.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class GoalAdapter extends TypeAdapter<GoalEntity> {
+class GoalEntityAdapter extends TypeAdapter<GoalEntity> {
   @override
   final int typeId = 0;
 
@@ -38,7 +38,7 @@ class GoalAdapter extends TypeAdapter<GoalEntity> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GoalAdapter &&
+      other is GoalEntityAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

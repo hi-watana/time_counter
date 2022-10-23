@@ -6,7 +6,7 @@ import 'goal_entity.dart';
 const _goalBoxName = 'goalBox';
 
 Future<Box<GoalEntity>> openGoalBox() {
-  Hive.registerAdapter(GoalAdapter());
+  Hive.registerAdapter(GoalEntityAdapter());
   return Hive.openBox<GoalEntity>(_goalBoxName);
 }
 
