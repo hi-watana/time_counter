@@ -57,7 +57,7 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _goalListSize = context.watch<GoalList>().size();
+    final goalListSize = context.watch<GoalList>().size();
 
     return Scaffold(
       appBar: AppBar(
@@ -69,7 +69,7 @@ class MyHomePage extends StatelessWidget {
             child: CountdownListView(),
           ),
           Hero(
-            tag: '$updateTagPrefix$_goalListSize',
+            tag: '$updateTagPrefix$goalListSize',
             child: const SizedBox(
               width: double.infinity,
               child: Card(),
@@ -82,7 +82,7 @@ class MyHomePage extends StatelessWidget {
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(
             builder: (_) => CountdownView(
-              tag: '$updateTagPrefix$_goalListSize',
+              tag: '$updateTagPrefix$goalListSize',
               updateGoalList: (GoalList goalList, GoalView goal) {
                 goalList.add(goal);
               },
