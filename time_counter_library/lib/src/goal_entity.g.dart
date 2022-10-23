@@ -1,29 +1,29 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'goal.dart';
+part of 'goal_entity.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class GoalAdapter extends TypeAdapter<Goal> {
+class GoalAdapter extends TypeAdapter<GoalEntity> {
   @override
   final int typeId = 0;
 
   @override
-  Goal read(BinaryReader reader) {
+  GoalEntity read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Goal(
+    return GoalEntity(
       endTime: fields[0] as DateTime,
       description: fields[1] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Goal obj) {
+  void write(BinaryWriter writer, GoalEntity obj) {
     writer
       ..writeByte(2)
       ..writeByte(0)
