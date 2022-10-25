@@ -8,11 +8,11 @@ import 'package:time_counter_library/time_counter_library.dart';
 import 'countdown_text.dart';
 import 'countdown_view.dart';
 
-class _CountdownElement extends StatelessWidget {
+class CountdownElement extends StatelessWidget {
   final Goal _goal;
   final int _index;
 
-  const _CountdownElement({
+  const CountdownElement({
     Key? key,
     required goal,
     required index,
@@ -87,7 +87,7 @@ class CountdownListView extends StatelessWidget {
     final _goalList = context.watch<GoalList>();
     return ListView(
       children: _goalList.get().asMap().entries.map((e) {
-        return _CountdownElement(
+        return CountdownElement(
           goal: e.value,
           index: e.key,
         );
