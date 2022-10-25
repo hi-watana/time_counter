@@ -9,7 +9,7 @@ class GoalList extends ChangeNotifier {
 
   GoalList(this._goalRepository);
 
-  void add(Goal goal) {
+  void add(GoalView goal) {
     _goalRepository.add(goal);
     notifyListeners();
   }
@@ -19,12 +19,12 @@ class GoalList extends ChangeNotifier {
     notifyListeners();
   }
 
-  void update(int i, Goal goal) {
+  void update(int i, GoalView goal) {
     _goalRepository.update(i, goal);
     notifyListeners();
   }
 
   int size() => _goalRepository.size();
 
-  List<Goal> get() => _goalRepository.get();
+  List<GoalView> get() => _goalRepository.get();
 }

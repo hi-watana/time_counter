@@ -10,10 +10,8 @@ class RemainingTime {
   const RemainingTime._(this.years, this.months, this.days, this.hours, this.minutes, this.seconds, this.isTimeUp);
 
   static RemainingTime of({required DateTime goal, required DateTime current}) {
-    final localGoal = goal.toUtc();
-    final localCurrent = current.toUtc();
-    final goalTime = DateTime(localGoal.year, localGoal.month, localGoal.day, localGoal.hour, localGoal.minute, localGoal.second);
-    final currentTime = DateTime(localCurrent.year, localCurrent.month, localCurrent.day, localCurrent.hour, localCurrent.minute, localCurrent.second);
+    final goalTime = DateTime(goal.year, goal.month, goal.day, goal.hour, goal.minute, goal.second);
+    final currentTime = DateTime(current.year, current.month, current.day, current.hour, current.minute, current.second);
     final isTimeUp = goalTime.isBefore(currentTime);
 
     if (isTimeUp) {
@@ -32,10 +30,10 @@ class RemainingTime {
     if (after.day < day.day) {
       dd = 31 - day.day + 1;
       dd = after.day - day.add(Duration(days: dd)).day + dd;
+      day = day.add(Duration(days: dd));
     } else {
       dd = after.day - day.day;
     }
-    day = day.add(Duration(days: dd));
     late final int dM;
     late final int dy;
     if (after.month < day.month) {
@@ -49,16 +47,20 @@ class RemainingTime {
     return RemainingTime._(dy, dM, dd, dh, dm, ds, isTimeUp);
   }
 
-  String getStringFormat() {
+  @override
+  String toString() {
+    bool nonZero = false;
     StringBuffer sb = StringBuffer();
     sb.write(isTimeUp ? '- ' : '+ ');
     if (years > 0) {
       sb.write('${years}y ');
+      nonZero = true;
     }
-    if (months > 0) {
+    if (nonZero || months > 0) {
       sb.write('${months.toString().padLeft(2, '0')}M ');
+      nonZero = true;
     }
-    if (days > 0) {
+    if (nonZero || days > 0) {
       sb.write('${days.toString().padLeft(2, '0')}d ');
     }
     sb.write('${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}');

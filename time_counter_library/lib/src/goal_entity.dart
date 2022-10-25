@@ -1,15 +1,15 @@
 import 'package:hive/hive.dart';
-part 'goal.g.dart';
+part 'goal_entity.g.dart';
 
 @HiveType(typeId: 0)
-class Goal {
+class GoalEntity {
   @HiveField(0)
   final DateTime endTime;
 
   @HiveField(1)
   final String description;
 
-  Goal({
+  const GoalEntity({
     required this.endTime,
     required this.description,
   });

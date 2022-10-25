@@ -31,15 +31,15 @@ class _GoalSubmitter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _titleController = context.watch<TextEditingController>();
-    final _onSubmit = context.read<Null Function(GoalList, Goal)>();
-    final _goalList = context.read<GoalList>();
+    final titleController = context.watch<TextEditingController>();
+    final onSubmit = context.read<Null Function(GoalList, GoalView)>();
+    final goalList = context.read<GoalList>();
 
     return OutlinedButton(
-      onPressed: _titleController.text.isNotEmpty ? () {
-        _onSubmit(_goalList, Goal(
-          endTime: context.read<SelectedTime>().get().toUtc(),
-          description: _titleController.text,
+      onPressed: titleController.text.isNotEmpty ? () {
+        onSubmit(goalList, GoalView(
+          endTime: context.read<SelectedTime>().get(),
+          description: titleController.text,
         ));
         Navigator.pop(context);
       } : null,
@@ -56,12 +56,12 @@ class _DateSelector extends StatelessWidget {
 
   const _DateSelector({Key? key}) : super(key: key);
 
-  Future<DateTime?> _pickDate(BuildContext context, DateTime _selectedTime) async {
+  Future<DateTime?> _pickDate(BuildContext context, DateTime selectedTime) async {
     final now = DateTime.now();
     return await showDatePicker(
         context: context,
         initialDate:
-        _selectedTime,
+        selectedTime,
         firstDate:
         now.subtract(_earliestDateDuration),
         lastDate: now.add(_latestDateDuration),
@@ -70,19 +70,19 @@ class _DateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedTime = context.watch<SelectedTime>();
+    final selectedTime = context.watch<SelectedTime>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          DateFormat.yMMMEd().format(_selectedTime.get()),
+          DateFormat.yMMMEd().format(selectedTime.get()),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         IconButton(
           alignment: Alignment.centerRight,
           onPressed: () async {
-            _selectedTime.setDate(await _pickDate(context, _selectedTime.get()));
+            selectedTime.setDate(await _pickDate(context, selectedTime.get()));
           }, icon: const Icon(Icons.edit),
         ),
       ],
@@ -96,25 +96,25 @@ class _TimeSelector extends StatelessWidget {
 
   const _TimeSelector({Key? key}) : super(key: key);
 
-  Future<TimeOfDay?> _pickTime(BuildContext context, DateTime _selectedTime) async {
-    return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_selectedTime));
+  Future<TimeOfDay?> _pickTime(BuildContext context, DateTime selectedTime) async {
+    return await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(selectedTime));
   }
 
   @override
   Widget build(BuildContext context) {
-    final _selectedTime = context.watch<SelectedTime>();
+    final selectedTime = context.watch<SelectedTime>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          _timeFormat.format(_selectedTime.get()),
+          _timeFormat.format(selectedTime.get()),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         IconButton(
           alignment: Alignment.centerRight,
           onPressed: () async {
-            _selectedTime.setTime(await _pickTime(context, _selectedTime.get()));
+            selectedTime.setTime(await _pickTime(context, selectedTime.get()));
           }, icon: const Icon(Icons.edit),
         ),
       ],

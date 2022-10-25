@@ -11,18 +11,18 @@ class CountdownText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TimeCounter _timeCounter = context.watch<TimeCounter>();
-    final _remainingTime = RemainingTime.of(goal: _goal, current: _timeCounter.getDateTime());
-    final _headline4 = Theme.of(context).textTheme.headline4;
-    if (_remainingTime.isTimeUp) {
+    final TimeCounter timeCounter = context.watch<TimeCounter>();
+    final remainingTime = RemainingTime.of(goal: _goal, current: timeCounter.getDateTime());
+    final headline4 = Theme.of(context).textTheme.headline4;
+    if (remainingTime.isTimeUp) {
       return Text(
-        _remainingTime.getStringFormat(),
-        style: _headline4?.copyWith(color: _headline4.color?.withAlpha(60)),
+        remainingTime.toString(),
+        style: headline4?.copyWith(color: headline4.color?.withAlpha(60)),
       );
     }
     return Text(
-      _remainingTime.getStringFormat(),
-      style: _headline4,
+      remainingTime.toString(),
+      style: headline4,
     );
   }
 }
