@@ -66,6 +66,7 @@ class MyHomePage extends StatelessWidget {
     final goalListSize = context.watch<GoalList>().size();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(title),
       ),
@@ -82,7 +83,7 @@ class MyHomePage extends StatelessWidget {
             ),
           ),
           MyBanner(),
-        ],
+       ],
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: bannerFieldHeight),
