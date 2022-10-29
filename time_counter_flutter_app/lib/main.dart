@@ -81,14 +81,11 @@ class MyHomePage extends StatelessWidget {
               child: Card(),
             ),
           ),
-          Container(
-            height: 50,
-            child: MyBanner(),
-          ),
+          MyBanner(),
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 50.0),
+        padding: const EdgeInsets.only(bottom: bannerFieldHeight),
         child: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
