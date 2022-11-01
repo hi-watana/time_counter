@@ -1,25 +1,32 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_config/flutter_config.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:time_counter/countdown_view.dart';
 import 'package:time_counter/constants.dart';
+import 'package:time_counter/countdown_view.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
+import 'banner_ad.dart';
 import 'countdown_list_view.dart';
 
 void main() async {
   await Hive.initFlutter();
   final goalBox = await openGoalBox();
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterConfig.loadEnvVariables();
   await SystemChrome.setPreferredOrientations(
     [
       DeviceOrientation.portraitUp
     ],
   );
+
+  MobileAds.instance.initialize();
+
   runApp(
     MultiProvider(
       providers: [
@@ -76,20 +83,24 @@ class MyHomePage extends StatelessWidget {
               child: Card(),
             ),
           ),
-        ],
+          MyBanner(),
+       ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (_) => CountdownView(
-              tag: '$updateTagPrefix$goalListSize',
-              updateGoalList: (GoalList goalList, GoalView goal) {
-                goalList.add(goal);
-              },
-            ),
-          ));
-        },
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: bannerFieldHeight),
+        child: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CountdownView(
+                tag: '$updateTagPrefix$goalListSize',
+                updateGoalList: (GoalList goalList, GoalView goal) {
+                  goalList.add(goal);
+                },
+              ),
+            ));
+          },
+        ),
       ),
     );
   }
