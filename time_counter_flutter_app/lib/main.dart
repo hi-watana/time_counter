@@ -60,6 +60,7 @@ class MyHomePage extends StatelessWidget {
     final goalListSize = context.watch<GoalList>().size();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(title),
       ),
