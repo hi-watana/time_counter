@@ -5,9 +5,9 @@ import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/selected_time.dart';
 import 'package:time_counter_library/time_counter_library.dart';
 
-class _DescriptionSetter extends StatelessWidget {
+import 'constants.dart';
 
-  static const int maxTitleLength = 60;
+class _DescriptionSetter extends StatelessWidget {
 
   const _DescriptionSetter({Key? key}) : super(key: key);
 
@@ -15,8 +15,9 @@ class _DescriptionSetter extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       enabled: true,
-      maxLength: maxTitleLength,
-      maxLines: 1,
+      maxLength: maxDescriptionLength,
+      minLines: 1,
+      maxLines: 4,
       textAlign: TextAlign.left,
       controller: context.read<TextEditingController>(),
       decoration: const InputDecoration(

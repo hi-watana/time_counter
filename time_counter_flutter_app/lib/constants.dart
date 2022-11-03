@@ -4,3 +4,5 @@ const updateTagPrefix = 'update_tag_';
 const appTitle = 'GoalTime';
 
 const bannerFieldHeight = 52.0;
+
+const int maxDescriptionLength = 100;
