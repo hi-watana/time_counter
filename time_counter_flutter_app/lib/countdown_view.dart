@@ -62,7 +62,7 @@ class CountdownView extends StatelessWidget {
                   ),
                 ),
               ),
-              MyBanner(),
+              //MyBanner(),
             ],
           ),
         ),

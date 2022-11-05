@@ -46,6 +46,7 @@ class MyApp extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: appTitle,
           theme: _lightTheme(lightDynamic),
           darkTheme: _darkTheme(darkDynamic),
@@ -83,11 +84,11 @@ class MyHomePage extends StatelessWidget {
               child: Card(),
             ),
           ),
-          MyBanner(),
+          //MyBanner(),
        ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: bannerFieldHeight),
+        padding: const EdgeInsets.only(),
         child: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
