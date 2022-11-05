@@ -25,40 +25,47 @@ class CountdownView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Hero(
-              tag: _heroTag,
-              child: Card(
-                child: MultiProvider(
-                  providers: [
-                    ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime(initialTime: goal?.endTime)),
-                    ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController(text: goal?.description)),
-                    Provider.value(value: _updateGoalList),
-                  ],
-                  builder: (context, child) {
-                    return Container(
-                      margin: const EdgeInsets.all(20),
-                      child: const _CountdownElement(),
-                    );
-                  },
-                ),
-              ),
+    final focusNode = FocusNode();
+    return Focus(
+      focusNode: focusNode,
+      child: GestureDetector(
+        onTap: focusNode.requestFocus,
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
           ),
-          MyBanner(),
-        ],
+          body: Column(
+            children: [
+              Expanded(
+                child: Hero(
+                  tag: _heroTag,
+                  child: Card(
+                    child: MultiProvider(
+                      providers: [
+                        ChangeNotifierProvider<SelectedTime>(create: (_) => SelectedTime(initialTime: goal?.endTime)),
+                        ChangeNotifierProvider<TextEditingController>(create: (_) => TextEditingController(text: goal?.description)),
+                        Provider.value(value: _updateGoalList),
+                      ],
+                      builder: (context, child) {
+                        return Container(
+                          margin: const EdgeInsets.all(20),
+                          child: const _CountdownElement(),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              MyBanner(),
+            ],
+          ),
+        ),
       ),
     );
   }
