@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:time_counter/constants.dart';
 import 'package:time_counter/countdown_view.dart';
+import 'package:time_counter_flutter_library/banner_ad_height.dart';
 import 'package:time_counter_flutter_library/goal_list.dart';
 import 'package:time_counter_flutter_library/time_counter.dart';
 import 'package:time_counter_library/time_counter_library.dart';
@@ -32,6 +33,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider<TimeCounter>(create: (_) => TimeCounter()),
         ChangeNotifierProvider<GoalList>(create: (_) => GoalList(GoalRepository(goalBox))),
+        ChangeNotifierProvider<BannerAdHeightHolder>(create: (_) => BannerAdHeightHolder()),
       ],
       builder: (context, child) => const MyApp(),
     )
@@ -65,6 +67,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final goalListSize = context.watch<GoalList>().size();
+    final bannerAdHeight = context.watch<BannerAdHeightHolder>();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -73,8 +76,10 @@ class MyHomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const Expanded(
-            child: CountdownListView(),
+          Expanded(
+            child: bannerAdHeight.getAdHeight() == null
+                ? Container()
+                : const CountdownListView(),
           ),
           Hero(
             tag: '$updateTagPrefix$goalListSize',
@@ -83,11 +88,11 @@ class MyHomePage extends StatelessWidget {
               child: Card(),
             ),
           ),
-          MyBanner(),
-       ],
+          const MyBanner(),
+        ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: bannerFieldHeight),
+      floatingActionButton: bannerAdHeight.getAdHeight() == null ? null : Padding(
+        padding: EdgeInsets.only(bottom: bannerAdHeight.getAdHeight()!.toDouble()),
         child: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
