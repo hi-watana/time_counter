@@ -1,3 +1,7 @@
-## 0.0.1
+## 1.0.0
 
-* TODO: Describe initial release.
+* Users can see multiple goals
+* Users can create a goal
+* Users can edit a goal
+* Users can delete a goal
+* Ad banner is embedded
