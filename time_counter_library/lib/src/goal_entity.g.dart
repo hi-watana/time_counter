@@ -19,17 +19,20 @@ class GoalEntityAdapter extends TypeAdapter<GoalEntity> {
     return GoalEntity(
       endTime: fields[0] as DateTime,
       description: fields[1] as String,
+      updated: fields[2] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, GoalEntity obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.endTime)
       ..writeByte(1)
-      ..write(obj.description);
+      ..write(obj.description)
+      ..writeByte(2)
+      ..write(obj.updated);
   }
 
   @override

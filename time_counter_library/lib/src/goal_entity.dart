@@ -9,8 +9,12 @@ class GoalEntity {
   @HiveField(1)
   final String description;
 
+  @HiveField(2)
+  final DateTime updated;
+
   const GoalEntity({
     required this.endTime,
     required this.description,
+    required this.updated,
   });
 }

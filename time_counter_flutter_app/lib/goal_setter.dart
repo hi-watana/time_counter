@@ -41,6 +41,7 @@ class _GoalSubmitter extends StatelessWidget {
         onSubmit(goalList, GoalView(
           endTime: context.read<SelectedTime>().get(),
           description: titleController.text,
+          updated: DateTime.now(),
         ));
         Navigator.pop(context);
       } : null,

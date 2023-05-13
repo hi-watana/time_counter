@@ -13,11 +13,13 @@ Future<Box<GoalEntity>> openGoalBox() {
 GoalEntity _toEntity(GoalView view) => GoalEntity(
   endTime: view.endTime.toUtc(),
   description: view.description,
+  updated: view.updated,
 );
 
 GoalView _toView(GoalEntity entity) => GoalView(
   endTime: entity.endTime.toLocal(),
   description: entity.description,
+  updated: entity.updated,
 );
 
 class GoalRepository {
