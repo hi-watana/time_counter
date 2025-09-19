@@ -2,8 +2,6 @@
 
 ![Featured Graphic](time_counter_flutter_app/assets/featured-graphics/featured-graphic.png)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
 "Time Counter" is a Flutter application inspired by the movie "In Time".
 It allows you to set goals with a specific deadline and visually track the remaining time, just like the time on the characters' arms in the movie.
 
